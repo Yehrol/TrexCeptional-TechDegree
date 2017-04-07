@@ -64,7 +64,7 @@
 			            result[i][j] = sum;
 			        }
 			    }
-			    
+
 			    return result;
 			}
 
@@ -105,22 +105,36 @@
 			    return resultArray;
 			}
 
+			costFunction(arrayX, arrayY) {
+				this.yHat = this.forward(arrayX);
+
+				var tmp = this.operationOnMatrix(this.operationOnMatrix(arrayY, this.yHat, this.substract), 2, this.power);
+				var J = 0.5 * tmp.reduce((pv, cv) => pv+cv, 0);
+
+				return J;
+			}
+
 			costFunctionPrime(arrayX, arrayY) {
 				this.yHat = this.forward(arrayX);
 
-				/*console.log(arrayY);
-				console.log(this.yHat);*/
+				//console.log(arrayY);
+				//console.log(this.yHat);
 
 				var tmp = this.operationOnMatrix(arrayY, this.yHat, this.substract);
-				
+				tmp = this.operationOnMatrix(tmp, [[-1],[-1],[-1]], this.multiply);
+				//console.log(this.yHat);
 				//console.log(this.a2);
 				//console.log(transposeMatrix(this.a2));
-				var delta3 = this.multiplyMatrix(tmp.map(value => -value), this.sigmoidPrime(this.z3));
+				//console.log(this.sigmoidPrime(this.z3));
+				//console.log(tmp);
+				//console.log(tmp.map(value => -value));
+				var delta3 = this.multiplyMatrix(tmp, this.sigmoidPrime(this.z3));
 				var dJdW2 = this.multiplyMatrix(transposeMatrix(this.a2), delta3)
 
-				/*console.log(this.W2);
-				console.log(transposeMatrix(this.W2));*/
-				var delta2 = this.multiplyMatrix(delta3, transposeMatrix(this.W2) * this.sigmoidPrime(this.z2));
+				//console.log(delta3);
+				//console.log(transposeMatrix(this.W2));
+				//console.log(this.sigmoidPrime(this.z2));
+				var delta2 = this.multiplyMatrix(delta3, this.multiplyMatrix(transposeMatrix(this.W2), this.sigmoidPrime(this.z2)));
 				var dJdW1 = this.multiplyMatrix(transposeMatrix(arrayX), delta2);
 
 				return [dJdW1, dJdW2];
@@ -130,7 +144,10 @@
 				var resultArray = new Array(arrayA.length);
 
 				for (var i = 0; i < arrayA.length; i++) {
-					resultArray[i] = operation(arrayA[i], arrayB[i]);
+					resultArray[i] = new Array();
+					for (var j = 0; j < arrayA[0].length; j++) {
+						resultArray[i][j] = operation(arrayA[i][j], arrayB[i][j]);
+					}
 				}
 
 				return resultArray;
@@ -140,6 +157,7 @@
 			substract(a, b) { return a - b; }
 			multiply(a, b) { return a * b; }
 			divide(a, b) { return a / b; }
+			power(a, b) { return a ** b; }
 
 			/*
 			Create a matrix from size (dimensionSize1, dimensionSize2) and put number between 0 and 1 in each cells.
@@ -202,7 +220,7 @@
 
 		// Data
 		var arrayX = [[3, 5],[5, 1],[10, 2]];
-		var arrayY = [75, 82, 93];
+		var arrayY = [[75], [82], [93]];
 
 		// Max value for each of the array
 		var maxX = getMaxValue(arrayX, 0);
@@ -216,15 +234,18 @@
 		}
 
 		for (var i = 0; i < arrayY.length; i++) {
-			arrayY[i] = parseFloat(arrayY[i] / maxY);
+			for (var j = 0; j < arrayY[0].length; j++) {
+				arrayY[i][j] = parseFloat(arrayY[i][j] / maxY);
+			}
 		}
 
 		var neural_net = new NeuralNetwork();
 		//var test = neural_net.forward(arrayX);
 		//var test1 = neural_net.costFunction(X,y);
+
 		var test2 = neural_net.costFunctionPrime(arrayX,arrayY);
 
-		//console.log(test);
+		console.log(test2);
 		//console.log(arrayY);
 	</script>
 </body>
