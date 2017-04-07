@@ -49,63 +49,11 @@
 			}
 
 			multiplyMatrix(m1, m2) {
-				//console.log(matrixA);
-				//console.log(matrixB);
-
-				//MatrixA Size
-				/*var aNumRows = matrixA.length;
-				var aNumCols = matrixA[0].length;
-
-				//MatrixB Size
-				var bNumRows = matrixB.length;
-				var bNumCols = matrixB[0].length;
-
-				// initialize array of rows
-				var resultArray = new Array(aNumRows);
-
-				if (bNumCols >= 1) {
-					//Rows
-					for (var r = 0; r < aNumRows; r++) {
-						resultArray[r] = new Array(bNumCols); // initialize the current row
-						//Columns
-						for (var c = 0; c < bNumCols; c++) {
-							resultArray[r][c] = 0;             // initialize the current cell
-							for (var i = 0; i < aNumCols; i++) {
-								resultArray[r][c] += matrixA[r][i] * matrixB[i][c];
-							}
-						}
-					}
-				}
-				else { //faire la meme pour aNumCols ?
-					//Rows
-					console.log(aNumRows);
-					for (var r = 0; r < aNumRows; r++) {
-						//Columns
-						resultArray[r] = 0;
-						for (var i = 0; i < aNumCols; i++) {
-							resultArray[r] += matrixA[r][i] * matrixB[r][0];
-						}
-					}
-				}
-
-				return resultArray;*/
-
-				/*var result = [];
-
-			    for(var j = 0; j < m2.length; j++) {
-			        result[j] = [];
-			        for(var k = 0; k < m1[0].length; k++) {
-			            var sum = 0;
-			            for(var i = 0; i < m1.length; i++) {
-			                sum += m1[i][k] * m2[j][i];
-			            }
-			            result[j].push(sum);
-			        }
-			    }
-
-			    return result;*/
+				//console.log(m1);
+				//console.log(m2);
 
 			    var result = [];
+
 			    for (var i = 0; i < m1.length; i++) {
 			        result[i] = [];
 			        for (var j = 0; j < m2[0].length; j++) {
@@ -116,6 +64,7 @@
 			            result[i][j] = sum;
 			        }
 			    }
+			    
 			    return result;
 			}
 
@@ -198,22 +147,15 @@
 			generateWeightsArray(dimensionSize1, dimensionSize2) {
 				var result = new Array(dimensionSize1);
 
-				//if (dimensionSize2 > 1) {
-					for (var i = 0; i < dimensionSize1; i++) {
-						result[i] = new Array(dimensionSize2);
-					}
+				for (var i = 0; i < dimensionSize1; i++) {
+					result[i] = new Array(dimensionSize2);
+				}
 
-					for (var x = 0; x < dimensionSize1; x++) {
-						for (var y = 0; y < dimensionSize2; y++) {
-							result[x][y] = Math.random();
-						}
+				for (var x = 0; x < dimensionSize1; x++) {
+					for (var y = 0; y < dimensionSize2; y++) {
+						result[x][y] = Math.random();
 					}
-				/*}
-				else {
-					for (var i = 0; i < dimensionSize1; i++) {
-						result[i] = Math.random();
-					}
-				}*/
+				}
 
 				return result
 			}
