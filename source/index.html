@@ -1,0 +1,289 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>test</title>
+</head>
+<body>
+	<canvas id="canvas" width="600" height="600" style="border:1px solid #000000;">
+	</canvas>
+
+	<script>
+		class NeuralNetwork {
+			constructor() {
+				// Hyper parameters
+				this.inputLayerSize = 2;
+				this.hiddenLayerSize = 3;
+				this.outputLayerSize = 1;
+
+				// Weights
+				this.W1 = this.generateWeightsArray(this.inputLayerSize, this.hiddenLayerSize);
+				this.W2 = this.generateWeightsArray(this.hiddenLayerSize, this.outputLayerSize);
+
+				this.z2;
+				this.a2;
+				this.z3;
+				this.yHat;
+			}
+
+			forward(X) {
+				//input to hidden layer
+				//console.log(this.W1);
+				//console.log(X);
+				this.z2 = this.multiplyMatrix(X, this.W1);
+				//console.log(this.z2);
+
+				//activation function
+				this.a2 = this.sigmoid(this.z2);
+				//console.log(a2);
+
+				//hidden to output layer
+				//console.log(this.a2);
+				//console.log(this.W2);
+				this.z3 = this.multiplyMatrix(this.a2, this.W2);
+				//console.log(this.z3);
+
+				//activation function
+				this.yHat = this.sigmoid(this.z3);
+
+				return this.yHat;
+			}
+
+			multiplyMatrix(m1, m2) {
+				//console.log(matrixA);
+				//console.log(matrixB);
+
+				//MatrixA Size
+				/*var aNumRows = matrixA.length;
+				var aNumCols = matrixA[0].length;
+
+				//MatrixB Size
+				var bNumRows = matrixB.length;
+				var bNumCols = matrixB[0].length;
+
+				// initialize array of rows
+				var resultArray = new Array(aNumRows);
+
+				if (bNumCols >= 1) {
+					//Rows
+					for (var r = 0; r < aNumRows; r++) {
+						resultArray[r] = new Array(bNumCols); // initialize the current row
+						//Columns
+						for (var c = 0; c < bNumCols; c++) {
+							resultArray[r][c] = 0;             // initialize the current cell
+							for (var i = 0; i < aNumCols; i++) {
+								resultArray[r][c] += matrixA[r][i] * matrixB[i][c];
+							}
+						}
+					}
+				}
+				else { //faire la meme pour aNumCols ?
+					//Rows
+					console.log(aNumRows);
+					for (var r = 0; r < aNumRows; r++) {
+						//Columns
+						resultArray[r] = 0;
+						for (var i = 0; i < aNumCols; i++) {
+							resultArray[r] += matrixA[r][i] * matrixB[r][0];
+						}
+					}
+				}
+
+				return resultArray;*/
+
+				/*var result = [];
+
+			    for(var j = 0; j < m2.length; j++) {
+			        result[j] = [];
+			        for(var k = 0; k < m1[0].length; k++) {
+			            var sum = 0;
+			            for(var i = 0; i < m1.length; i++) {
+			                sum += m1[i][k] * m2[j][i];
+			            }
+			            result[j].push(sum);
+			        }
+			    }
+
+			    return result;*/
+
+			    var result = [];
+			    for (var i = 0; i < m1.length; i++) {
+			        result[i] = [];
+			        for (var j = 0; j < m2[0].length; j++) {
+			            var sum = 0;
+			            for (var k = 0; k < m1[0].length; k++) {
+			                sum += m1[i][k] * m2[k][j];
+			            }
+			            result[i][j] = sum;
+			        }
+			    }
+			    return result;
+			}
+
+			// Sigmoid function
+			sigmoid(matrix) {
+				var resultArray = new Array(matrix.length);
+
+				//console.log(matrix);
+				if (typeof matrix[0].length != "undefined") {
+					for (var i = 0; i < matrix.length; i++) {
+						resultArray[i] = new Array(matrix[0].length);
+						for (var j = 0; j < matrix[0].length; j++) {
+							// Math.exp -> base of the natural logarithm (2.718)
+							resultArray[i][j] = parseFloat(1/(1+Math.exp(-matrix[i][j])));
+						}
+					}
+				}
+				else {
+					for (var i = 0; i < matrix.length; i++) {
+						// Math.exp -> base of the natural logarithm (2.718)
+						resultArray[i] = parseFloat(1/(1+Math.exp(-matrix[i])));
+					}
+				}
+
+			    return resultArray;
+			}
+
+			sigmoidPrime(matrix) {
+				var resultArray = new Array(matrix.length);
+
+				for (var i = 0; i < matrix.length; i++) {
+					resultArray[i] = new Array(matrix[0].length);
+					for (var j = 0; j < matrix[0].length; j++) {
+						resultArray[i][j] = parseFloat(Math.exp(-matrix[i][j]) / ((1+Math.exp(-matrix[i][j]))**2));
+					}
+				}
+				
+			    return resultArray;
+			}
+
+			costFunctionPrime(arrayX, arrayY) {
+				this.yHat = this.forward(arrayX);
+
+				/*console.log(arrayY);
+				console.log(this.yHat);*/
+
+				var tmp = this.operationOnMatrix(arrayY, this.yHat, this.substract);
+				
+				//console.log(this.a2);
+				//console.log(transposeMatrix(this.a2));
+				var delta3 = this.multiplyMatrix(tmp.map(value => -value), this.sigmoidPrime(this.z3));
+				var dJdW2 = this.multiplyMatrix(transposeMatrix(this.a2), delta3)
+
+				/*console.log(this.W2);
+				console.log(transposeMatrix(this.W2));*/
+				var delta2 = this.multiplyMatrix(delta3, transposeMatrix(this.W2) * this.sigmoidPrime(this.z2));
+				var dJdW1 = this.multiplyMatrix(transposeMatrix(arrayX), delta2);
+
+				return [dJdW1, dJdW2];
+			}
+
+			operationOnMatrix(arrayA, arrayB, operation) {
+				var resultArray = new Array(arrayA.length);
+
+				for (var i = 0; i < arrayA.length; i++) {
+					resultArray[i] = operation(arrayA[i], arrayB[i]);
+				}
+
+				return resultArray;
+			}
+
+			add(a, b) { return a + b; }
+			substract(a, b) { return a - b; }
+			multiply(a, b) { return a * b; }
+			divide(a, b) { return a / b; }
+
+			/*
+			Create a matrix from size (dimensionSize1, dimensionSize2) and put number between 0 and 1 in each cells.
+			*/
+			generateWeightsArray(dimensionSize1, dimensionSize2) {
+				var result = new Array(dimensionSize1);
+
+				//if (dimensionSize2 > 1) {
+					for (var i = 0; i < dimensionSize1; i++) {
+						result[i] = new Array(dimensionSize2);
+					}
+
+					for (var x = 0; x < dimensionSize1; x++) {
+						for (var y = 0; y < dimensionSize2; y++) {
+							result[x][y] = Math.random();
+						}
+					}
+				/*}
+				else {
+					for (var i = 0; i < dimensionSize1; i++) {
+						result[i] = Math.random();
+					}
+				}*/
+
+				return result
+			}
+		}
+
+		function getMaxValue(array, axis) {
+			var myArray = array;
+			var maxValue = 0;
+
+			if (typeof array[0][0] != "undefined") {
+				for (var i = 0; i < myArray.length; i++) {
+					if (myArray[i][axis] > maxValue) {
+						maxValue = myArray[i][axis];
+					}
+				}
+			}
+			else{
+				for (var i = 0; i < myArray.length; i++) {
+					if (myArray[i] > maxValue) {
+						maxValue = myArray[i];
+					}
+				}
+			}
+
+			return maxValue;
+		}
+
+		function transposeMatrix(array) {
+			var result;
+
+			result = array[0].map(function(col, i) { 
+				return array.map(function(row) { 
+					return row[i] 
+				})
+			});
+
+			return result;
+		}
+
+
+		// Get the canvas
+		var c = document.getElementById("canvas");
+		var ctx = c.getContext("2d");
+
+		// Data
+		var arrayX = [[3, 5],[5, 1],[10, 2]];
+		var arrayY = [75, 82, 93];
+
+		// Max value for each of the array
+		var maxX = getMaxValue(arrayX, 0);
+		var maxY = 100;
+
+		// Scale the value
+		for (var i = 0; i < arrayX.length; i++) {
+			for (var j = 0; j < arrayX[0].length; j++) {
+				arrayX[i][j] = parseFloat(arrayX[i][j] / maxX);
+			}
+		}
+
+		for (var i = 0; i < arrayY.length; i++) {
+			arrayY[i] = parseFloat(arrayY[i] / maxY);
+		}
+
+		var neural_net = new NeuralNetwork();
+		//var test = neural_net.forward(arrayX);
+		//var test1 = neural_net.costFunction(X,y);
+		var test2 = neural_net.costFunctionPrime(arrayX,arrayY);
+
+		//console.log(test);
+		//console.log(arrayY);
+	</script>
+</body>
+</html>
