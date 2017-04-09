@@ -8,7 +8,9 @@
 	</canvas>
 
 	<script>
+		//
 		class NeuralNetwork {
+			//
 			constructor() {
 				// Hyper parameters
 				this.inputLayerSize = 2;
@@ -25,6 +27,7 @@
 				this.yHat;
 			}
 
+			//
 			forward(X) {
 				//input to hidden layer
 				//console.log(this.W1);
@@ -48,6 +51,7 @@
 				return this.yHat;
 			}
 
+			//
 			multiplyMatrix(m1, m2) {
 				//console.log(m1);
 				//console.log(m2);
@@ -92,6 +96,7 @@
 			    return resultArray;
 			}
 
+			//
 			sigmoidPrime(matrix) {
 				var resultArray = new Array(matrix.length);
 
@@ -105,15 +110,22 @@
 			    return resultArray;
 			}
 
+			// Get the difference between the result and the wanted result
+			// if - => going down
+			// if + => going up
 			costFunction(arrayX, arrayY) {
 				this.yHat = this.forward(arrayX);
 
+				//
 				var tmp = this.operationOnMatrix(this.operationOnMatrix(arrayY, this.yHat, this.substract), 2, this.power);
+
+				// Add all the tmp array value and divide it by 2
 				var J = 0.5 * tmp.reduce((pv, cv) => pv+cv, 0);
 
 				return J;
 			}
 
+			//
 			costFunctionPrime(arrayX, arrayY) {
 				this.yHat = this.forward(arrayX);
 
@@ -140,6 +152,7 @@
 				return [dJdW1, dJdW2];
 			}
 
+			//
 			operationOnMatrix(arrayA, arrayB, operation) {
 				var resultArray = new Array(arrayA.length);
 
@@ -153,6 +166,7 @@
 				return resultArray;
 			}
 
+			//
 			add(a, b) { return a + b; }
 			substract(a, b) { return a - b; }
 			multiply(a, b) { return a * b; }
@@ -179,6 +193,7 @@
 			}
 		}
 
+		//
 		function getMaxValue(array, axis) {
 			var myArray = array;
 			var maxValue = 0;
@@ -201,6 +216,7 @@
 			return maxValue;
 		}
 
+		//
 		function transposeMatrix(array) {
 			var result;
 
