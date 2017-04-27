@@ -1,0 +1,205 @@
+<!doctype html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0,maximum-scale=1.0, user-scalable=no">
+    <title>T-Rex</title>
+
+    <link rel="stylesheet" href="css.css">
+    <link type="text/css" rel="stylesheet" href="libraries/materialize/css/materialize.min.css"  media="screen,projection"/>
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+</head>
+
+<body id="t" class="offline">
+        <nav>
+            <div class="nav-wrapper">
+                <a href="#" class="brand-logo" style="margin-left: 10px;">T-Rex</a>
+                <ul id="nav-mobile" class="right hide-on-med-and-down">
+                    <li><a href="#aboutModal">About</a></li>
+                    <li><a href="#contactModal">Contact</a></li>
+                </ul>
+            </div>
+        </nav>
+
+        <div class="container">
+            <div class="row">
+            
+                <div class="col s12 m12 l3">
+                    <div class="card-panel">
+                        <h5>Informations</h5>
+                        <div class="card-content">
+                            <div class="card-panel grey lighten-2">
+                                <h5>Network infos</h5>
+                                <div class="card-content">
+                                    <ul>
+                                        <li>Generation : <span id="generationIndex">0</span></li>
+                                        <li>Genome : <span id="genomeIndex">1</span></li>
+                                    </ul>
+                                </div>
+                            </div>
+                            <div class="card-panel grey lighten-2">
+                                <h5>T-Rex values</h5>
+                                <div class="card-content">
+                                    <ul>
+                                        <li>Distance : <span id="Distance">X</span></li>
+                                        <li>Y position : <span id="yPosition">X</span></li>
+                                        <li>Velocity : <span id="Velocity">X</span></li>
+                                        <li>Size : <span id="Size">X</span></li>
+                                    </ul>
+                                </div>
+                            </div>
+                            <div class="card-panel grey lighten-2">
+                                <h5>Controls</h5>
+                                <div class="card-content">
+                                    <div class="card-content">
+                                        <img src="assets/added/up.png" alt="input" class="responsive-img">
+                                        <img src="assets/added/down.png" alt="input" class="responsive-img">
+                                    </div>
+                                </div>
+                            </div>
+                            <button class="btn waves-effect waves-light" type="button" id="stateBtn" onclick="changeRunningState();">START
+                                <i class="material-icons right">power_settings_new</i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col s12 m12 l9">
+                    <div class="col s12 m12 l12">
+                        <div class="card-panel">
+                            <h5>Game</h5>
+                            <div class="card-content">
+                                <div id="main-frame-error" class="interstitial-wrapper">
+                                    <div id="main-content">
+                                        <div class="icon icon-offline" alt=""></div>
+                                    </div>
+                                    <div id="offline-resources">
+                                        <img id="offline-resources-1x" src="assets/default_100_percent/100-offline-sprite.png">
+                                        <img id="offline-resources-2x" src="assets/default_200_percent/200-offline-sprite.png">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col s12 m12 l12">
+                        <div class="card-panel" id="neuralNetPreview" style="height: 350px">
+                            <!--<canvas id="neuralNet" style="border-style: solid; width: 100%; height: 300px"></canvas>-->
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+        
+        <!-- Toolbar -->
+        <div class="fixed-action-btn toolbar">
+            <a class="btn-floating btn-large pulse red lighten-2">
+                <i class="large material-icons">mode_edit</i>
+            </a>
+            <ul>
+                <li class="waves-effect waves-light"><a class="modal-trigger waves-effect waves-light btn" href="#exportModal">EXPORT</a></li>
+                <li class="waves-effect waves-light"><a class="modal-trigger waves-effect waves-light btn" href="#importModal">IMPORT</a></li>
+                <li class="waves-effect waves-light"><a class="modal-trigger waves-effect waves-light btn" href="#showNetModal">SHOW/MODIFY NEURAL NETWORK</a></li>
+            </ul>
+        </div>
+
+        <!-- Export modal -->
+        <div id="exportModal" class="modal modal-footer">
+            <div class="modal-content">
+                <h4>Export the neural network</h4>
+
+                <form onsubmit="downloadFile('neural_network.txt', this['text'].value); return false;">
+                    <div class="input-field col s12">
+                        <textarea id="textareaExport" name="text" class="materialize-textarea" placeholder="Exported to text"></textarea>
+                    </div>
+
+                    <button class="btn waves-effect waves-light" type="submit" name="action">EXPORT TO FILE
+                        <i class="material-icons right">send</i>
+                    </button>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <a href="#!" class="modal-action modal-close waves-effect waves-red btn-flat ">Close</a>
+            </div>
+        </div>
+
+        <!-- Import modal -->
+        <div id="importModal" class="modal modal-footer">
+            <div class="modal-content">
+                <h4>Import a neural network</h4>
+
+                <div class="file-field input-field">
+                    <div class="btn">
+                        <span>SELECT FILE</span>
+                        <input type="file" id="selectedFile">
+                    </div>
+                    <div class="file-path-wrapper">
+                        <input class="file-path validate" type="text">
+                    </div>
+                </div>
+
+                <div class="input-field col s12">
+                    <textarea id="textareaImport" name="text" class="materialize-textarea" placeholder="Text to import"></textarea>
+                </div>
+
+                <button class="btn waves-effect waves-light" type="button" name="action" onclick="importNeuralNetwork();">IMPORT NEURAL NETWORK
+                    <i class="material-icons right">send</i>
+                </button>
+            </div>
+            <div class="modal-footer">
+                <a href="#!" class="modal-action modal-close waves-effect waves-red btn-flat ">Close</a>
+            </div>
+        </div>
+
+        <!-- Show neural network modal -->
+        <div id="showNetModal" class="modal modal-footer">
+            <div class="modal-content">
+                <h4>Neural network</h4>
+                <p>canvas showing the neural net</p>
+                <p>input to edit the neural net weights</p>
+            </div>
+            <div class="modal-footer">
+                <a href="#!" class="modal-action modal-close waves-effect waves-red btn-flat">Close</a>
+                <a href="#!" onclick="saveChange();" class="modal-action modal-close waves-effect waves-green btn-flat ">Save change</a>
+            </div>
+        </div>
+
+        <!-- Contact modal -->
+        <div id="contactModal" class="modal modal-footer">
+            <div class="modal-content">
+                <h4>Contact</h4>
+            </div>
+            <div class="modal-footer">
+                <a href="#!" class="modal-action modal-close waves-effect waves-red btn-flat ">Close</a>
+            </div>
+        </div>
+
+        <!-- About modal -->
+        <div id="aboutModal" class="modal modal-footer">
+            <div class="modal-content">
+                <h4>About</h4>
+            </div>
+            <div class="modal-footer">
+                <a href="#!" class="modal-action modal-close waves-effect waves-red btn-flat ">Close</a>
+            </div>
+        </div>
+
+    <!-- SCRIPTS -->
+    <script src="libraries/jQuery/jquery-3.2.1.min.js"></script>
+    <script type="text/javascript" src="libraries/materialize/js/materialize.min.js"></script>
+
+    <script src="classes/neural_network.js"></script>
+    <script src="classes/layer.js"></script>
+    <script src="classes/neuron.js"></script>
+    <script src="classes/connection.js"></script>
+    <script src="classes/activation_function.js"></script>
+    <script src="classes/generation.js"></script>
+    <script src="classes/genome.js"></script>
+
+    <script src="trex.js"></script>
+    <script src="main.js"></script>
+</body>
+
+</html>
