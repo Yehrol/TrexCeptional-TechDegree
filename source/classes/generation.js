@@ -6,11 +6,12 @@
 ***********************************************************/
 
 class Generation {
-	constructor(pTopology, pNbOfGenome, pActivationFunction) {
+	constructor(pTopology, pNbOfGenome, pActivationFunction, pRate) {
 		this.genomes = [];
 		this.numberOfGenomes = pNbOfGenome;
 		this.generation = 0;
 		this.currentGenome = 0;
+		this.rate = pRate;
 
 		// Forced to store them to create a new object from the object
 		this.topology = pTopology;
@@ -36,13 +37,13 @@ class Generation {
     	this.genomes[this.currentGenome].neuralNet.feedForward(input);
 
 		// Check which move the AI should do
-		if (this.genomes[this.currentGenome].neuralNet.getOutput() > 0.6) { // greater than 0.6 [press up]
+		if (this.genomes[this.currentGenome].neuralNet.getOutput() > 0.7) { // greater than 0.6 [press up]
 			simulateKeyPress(38, "keydown");
 		}
 		else if (this.genomes[this.currentGenome].neuralNet.getOutput() >= 0.4 && this.genomes[this.currentGenome].neuralNet.getOutput() <= 0.6) { // between 0.4 and 0.6 (both include) [do nothing]
 			// do nothing
 		} 
-		else if (this.genomes[this.currentGenome].neuralNet.getOutput() < 0.4) { // less than 0.4 [press down]
+		else if (this.genomes[this.currentGenome].neuralNet.getOutput() < 0.3) { // less than 0.4 [press down]
 			simulateKeyPress(40, "keydown");
 		}
 	}
@@ -107,10 +108,7 @@ class Generation {
 
 	}
 
-	mutation() {
-
-	}
-
+	//
 	singlePointCrossover(pSelectedGenomes){
 		var children = [];
 		// Create a copy of the genomes
@@ -119,7 +117,7 @@ class Generation {
 
 		// Store all the weights in an array
 		for (var g = 0; g < pSelectedGenomes.length; g++) {
-			weights = pSelectedGenomes[g].getWeights();
+			weights.push(pSelectedGenomes[g].getWeights());
 		}
 
 		// For each genome
@@ -127,17 +125,29 @@ class Generation {
 			//Pair of genome
 			for (var pairIndex = 0; pairIndex < pSelectedGenomes.length; pairIndex+=2) {
 				//Get the pair of genome
-				var breedA = pSelectedGenomes[pairIndex].getWeights();
-				var breedB = pSelectedGenomes[pairIndex+1].getWeights();
+				var breedA;
+				var breedB;
 				var newWeight = [];
 				//Number of genome to create per pair
 				for (var i = 0; i < this.genomes.length / (pSelectedGenomes.length / 2); i++) {
+					// Check which breed will be first
+					var aFirst = Math.random() >= 0.5; //Random bool
+					if (aFirst) {
+						breedA = pSelectedGenomes[pairIndex].getWeights();
+						breedB = pSelectedGenomes[pairIndex+1].getWeights();
+					}
+					else{
+						breedA = pSelectedGenomes[pairIndex+1].getWeights();
+						breedB = pSelectedGenomes[pairIndex].getWeights();
+					}
+
 					// Get a random crossover point
-					var crossoverPoint = Math.random(weights[0].length);
+					var crossoverPoint = Math.floor(Math.random() * (weights[0].length + 1));
 
 					// Create a new weight
-					newWeight = breedA.slice(0, crossoverPoint);
-					newWeight.push(breedB.slice(crossoverPoint + 1, weights[0].length));
+					newWeight.push(breedA.slice(0, crossoverPoint));
+					newWeight.push(breedB.slice(crossoverPoint, crossoverPoint + weights[0].length));
+					newWeight = ravel(newWeight);
 				}
 				// Add the new weight
 				children.push(newWeight);
@@ -148,7 +158,87 @@ class Generation {
 		}
 
 		// Assign the new generation
-		this.genomes = genClone.genomes;
+		this.mutationWithRate(genClone.genomes);
+		//this.mutation(genClone.genomes);
+	}
+
+	//
+	mutation(nextGenomes) {
+		var weights = [];
+
+		// Store all the weights in an array
+		for (var g = 0; g < nextGenomes.length; g++) {
+			weights.push(nextGenomes[g].getWeights());
+		}
+
+		// Number of values that will change
+		var nbValuesToChange;
+
+		// Apply random mutation to each genomes
+		for (var genIndex = 0; genIndex < weights.length; genIndex++) {
+			// Get the number of values that need to change
+			var indexArray = [];
+			var alreadyExist;
+			nbValuesToChange = Math.floor(Math.random() * (weights[genIndex].length + 1));
+
+			// While we dont have all the index that needs to change
+			while (indexArray.length < nbValuesToChange) {
+				alreadyExist = false;
+				var indexToChange = Math.floor(Math.random() * (weights[genIndex].length + 1));
+
+				// Check if the current index has already been changed
+				for (var i = 0; i < indexArray.length; i++) {
+					if (indexToChange == indexArray[i]) {
+						alreadyExist = true;
+					}
+				}
+
+				// If the current index hasn't been changed previously
+				if (alreadyExist ==  false) {
+					indexArray.push(indexToChange)
+				}
+			}
+
+			// Change the weights randomly
+			for (var i = 0; i < indexArray.length; i++) {
+
+				weights[genIndex][indexArray[i]] += Math.random() - 0.5;
+			}
+
+			// Apply the changes
+			nextGenomes[genIndex].setWeights(weights[genIndex]);
+		}
+
+		this.genomes = nextGenomes;
+	}
+
+	//
+	mutationWithRate(nextGenomes) {
+		var weights = [];
+
+		// Store all the weights in an array
+		for (var g = 0; g < nextGenomes.length; g++) {
+			weights.push(nextGenomes[g].getWeights());
+		}
+
+		// Number of values that will change
+		var nbValuesToChange;
+
+		// Apply random mutation to each genomes
+		for (var genIndex = 0; genIndex < weights.length; genIndex++) {
+
+			// Change the weights randomly
+			for (var i = 0; i < weights[genIndex].length; i++) {
+				if (this.rate <= Math.random()) {
+					weights[genIndex][i] += Math.random() - 0.5;
+				}
+			}
+
+			// Apply the changes
+			nextGenomes[genIndex].setWeights(weights[genIndex]);
+		}
+
+		this.genomes = nextGenomes;
 	}
 }
 

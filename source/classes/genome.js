@@ -20,6 +20,6 @@ class Genome {
 	}
 
 	setWeights(pWeights) {
-		this.neuralNet.setWeights(ravel(pWeights));
+		this.neuralNet.setWeights(pWeights);
 	}
 }

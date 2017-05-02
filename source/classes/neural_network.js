@@ -70,9 +70,7 @@ class NeuralNetwork {
 			}
 			
 			var nbOfNeuronsInLayer = (this.layers[i].neurons.length - nbBias) * nextLayerLength;
-			//BUG ICI dans le slice
-			log(nbOfNeuronsInLayer);
-			this.layers[i].setWeights(pWeights.slice(pos, nbOfNeuronsInLayer), nextLayerLength);
+			this.layers[i].setWeights(pWeights.slice(pos, pos + nbOfNeuronsInLayer), nextLayerLength);
 			pos+=nbOfNeuronsInLayer;
 		}
 	}

@@ -9,6 +9,12 @@
 var isRunning = false;
 var gen;
 var runner;
+var numberOfGenomes = 4; //Genomes per generation [minimum 4]
+
+// Var to calculate fitness
+var nbOfObstacle = 0;
+var lastValue = 1000;
+var updateRate = 100;
 
 // Max values
 var maxVelocity;
@@ -51,8 +57,7 @@ $(document).ready(function(){
 
     // Main code
     topology = [4,3,1];
-    var numberOfGenomes = 4; //minimum 4
-    gen = new Generation(topology, numberOfGenomes, new tanh());
+    gen = new Generation(topology, numberOfGenomes, new tanh(), 0.5);
     //neural_net = new NeuralNetwork(topology, new tanh());
     
     //
@@ -61,7 +66,9 @@ $(document).ready(function(){
 		if (typeof runner.horizon.obstacles[0] != "undefined") {
 		    startIA(parseFloat(runner.currentSpeed.toFixed(3)), parseFloat(runner.horizon.obstacles[0].xPos), parseFloat(runner.horizon.obstacles[0].yPos), parseFloat(runner.horizon.obstacles[0].size));
 		}
-	}, 100);
+
+
+	}, updateRate);
 
 	/*var c = document.getElementById("neuralNet");
 	var ctx = c.getContext("2d");*/
@@ -96,6 +103,9 @@ function changeRunningState() {
 	}
 }
 
+var test = 0;
+var timePassed = 0;
+
 // 
 function startIA(pVelocity,pDistance,pYPosition,pSize) {
     // Show some value for debuging
@@ -122,12 +132,26 @@ function startIA(pVelocity,pDistance,pYPosition,pSize) {
 		$("#neuralNetPreview").html(neuralNetPreview);
 		/***************temporaire (debugage)***************/
 
+		// timer
+		test++;
+		if (test >= 10) {
+			timePassed++;
+			$("#timeIndex").html(timePassed);
+			test = 0;
+		}
+
 		// Run the generation
 		gen.run(pVelocity, pDistance, pYPosition, pSize);
 
+		// Get the number of obstacle passed
+		if (pDistance > lastValue) {
+			nbOfObstacle++;
+		}
+		lastValue = pDistance;
+
 		// When the AI die
 		if (runner.crashed) {
-			var fitness = runner.distanceRan.toFixed(0);
+			var fitness = nbOfObstacle;//runner.distanceRan.toFixed(0)s
 
 			// Restart the game
 			simulateKeyPress(38, "keyup");
@@ -138,6 +162,7 @@ function startIA(pVelocity,pDistance,pYPosition,pSize) {
 			if (!runner.crashed) {
 				// Change the generation and save the fitness
 				gen.nextGen(fitness);
+				nbOfObstacle = 0;
 
 				// Update the interface
 				$('#generationIndex').html(gen.generation);
@@ -236,7 +261,7 @@ function ravel(array) {
 	return result;
 }
 
-//
+// For debug
 function log(msg) {
 	console.log(msg);
 }
