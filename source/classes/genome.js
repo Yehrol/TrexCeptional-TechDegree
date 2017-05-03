@@ -22,4 +22,12 @@ class Genome {
 	setWeights(pWeights) {
 		this.neuralNet.setWeights(pWeights);
 	}
+
+	feedForward(inputValues) {
+		this.neuralNet.feedForward(inputValues);
+	}
+
+	getOutput() {
+		return this.neuralNet.getOutput();
+	}
 }

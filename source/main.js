@@ -7,21 +7,24 @@
 
 // Set the state of the AI
 var isRunning = false;
-var gen;
 var runner;
-var numberOfGenomes = 4; //Genomes per generation [minimum 4]
+
+var gen;
+var numberOfGenomes = 12; //Genomes per generation [minimum 4]
+var mutationRate = 0.3;
+var topology
+
+var FPS = 60;
 
 // Var to calculate fitness
 var nbOfObstacle = 0;
 var lastValue = 1000;
-var updateRate = 100;
 
 // Max values
 var maxVelocity;
 var maxDistance;
 var maxYPosition;
 var maxSize;
-var topology
 
 // When the page is fully loaded
 $(document).ready(function(){
@@ -56,8 +59,9 @@ $(document).ready(function(){
 	maxSize = runner.config.MAX_OBSTACLE_LENGTH;
 
     // Main code
-    topology = [4,3,1];
-    gen = new Generation(topology, numberOfGenomes, new tanh(), 0.5);
+    //topology = [4,3,1];
+    topology = [1,3,1];
+    gen = new Generation(topology, numberOfGenomes, new sigmoid(), mutationRate);
     //neural_net = new NeuralNetwork(topology, new tanh());
     
     //
@@ -68,7 +72,7 @@ $(document).ready(function(){
 		}
 
 
-	}, updateRate);
+	}, 1000 / FPS);
 
 	/*var c = document.getElementById("neuralNet");
 	var ctx = c.getContext("2d");*/
@@ -134,7 +138,7 @@ function startIA(pVelocity,pDistance,pYPosition,pSize) {
 
 		// timer
 		test++;
-		if (test >= 10) {
+		if (test >= FPS) {
 			timePassed++;
 			$("#timeIndex").html(timePassed);
 			test = 0;
@@ -151,10 +155,10 @@ function startIA(pVelocity,pDistance,pYPosition,pSize) {
 
 		// When the AI die
 		if (runner.crashed) {
-			var fitness = nbOfObstacle;//runner.distanceRan.toFixed(0)s
+			var fitness = nbOfObstacle;//runner.distanceRan.toFixed(0)
 
 			// Restart the game
-			simulateKeyPress(38, "keyup");
+			restartGame();
 
 			$("#neuralNetPreview").html("");
 
@@ -162,7 +166,10 @@ function startIA(pVelocity,pDistance,pYPosition,pSize) {
 			if (!runner.crashed) {
 				// Change the generation and save the fitness
 				gen.nextGen(fitness);
+
+				// Reset the value (counting obstacle)
 				nbOfObstacle = 0;
+				lastValue = 1000
 
 				// Update the interface
 				$('#generationIndex').html(gen.generation);
@@ -175,11 +182,11 @@ function startIA(pVelocity,pDistance,pYPosition,pSize) {
 //
 function restartGame() {
 	simulateKeyPress(38, "keyup");
-	//console.log(runner.distanceRan);
 }
 
 // Simulate a key press
 // 38=up, 40=down, 32=space
+// "keyup", "keydown"
 function simulateKeyPress(keycode, type) {
 	var evt = new Event(type);
 	evt.keyCode=keycode;

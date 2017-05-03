@@ -8,10 +8,16 @@
 class Generation {
 	constructor(pTopology, pNbOfGenome, pActivationFunction, pRate) {
 		this.genomes = [];
-		this.numberOfGenomes = pNbOfGenome;
+		if (pNbOfGenome < 4) {
+			this.numberOfGenomes = 4;
+		}
+		else {
+			this.numberOfGenomes = pNbOfGenome;
+		}
 		this.generation = 0;
 		this.currentGenome = 0;
 		this.rate = pRate;
+		this.weightVariation = (Math.random() - 0.5) * 3 + (Math.random() - 0.5); //Math.random() * 1.5 - 0.5; // [-0.5...1]
 
 		// Forced to store them to create a new object from the object
 		this.topology = pTopology;
@@ -31,19 +37,31 @@ class Generation {
 	    var normalizedSize = pSize / maxSize;
 
 		// Create the input array for the neural network
-		var input = [normalizedVelocity,normalizedDistance,normalizedYPosition,normalizedSize];
+		var input = [normalizedDistance];//normalizedVelocity,,normalizedYPosition,normalizedSize
+		//log("velocity : " + normalizedVelocity);
+		//log("distance : " + normalizedDistance);
+		//log("y position : " + normalizedYPosition);
+		//log("size : " + normalizedSize);
 
 		// Feed the neural network with the normalized T-Rex value
-    	this.genomes[this.currentGenome].neuralNet.feedForward(input);
+    	this.genomes[this.currentGenome].feedForward(input);
 
 		// Check which move the AI should do
-		if (this.genomes[this.currentGenome].neuralNet.getOutput() > 0.7) { // greater than 0.6 [press up]
+		/*if (this.genomes[this.currentGenome].neuralNet.getOutput() > 0.7) { // greater than 0.6 [press up]
 			simulateKeyPress(38, "keydown");
 		}
 		else if (this.genomes[this.currentGenome].neuralNet.getOutput() >= 0.4 && this.genomes[this.currentGenome].neuralNet.getOutput() <= 0.6) { // between 0.4 and 0.6 (both include) [do nothing]
 			// do nothing
 		} 
 		else if (this.genomes[this.currentGenome].neuralNet.getOutput() < 0.3) { // less than 0.4 [press down]
+			simulateKeyPress(40, "keydown");
+		}*/
+		var result = this.genomes[this.currentGenome].getOutput();
+		$("#decision").html(result.toFixed(4));
+		if (result > 0.75) { // greater than 0.6 [press up]
+			simulateKeyPress(38, "keydown");
+		} 
+		else if (result < 0.40) { // less than 0.4 [press down]
 			simulateKeyPress(40, "keydown");
 		}
 	}
@@ -72,31 +90,55 @@ class Generation {
 	selection() {
 		// Store the best genome
 		var selected = [];
-		var arrayClone = [];
+		var tmpWeight = [];
 		var genomeToAppend;
-		var max = 0;
+		var max = -1;
+		var genClone;
+		var indexToRemove;
 
 		// Create a clone of the genomes
-		arrayClone = this.genomes.slice(0);
+		genClone = new Generation(this.topology, this.numberOfGenomes, this.activationFunction, this.rate);
+
+		// Get all the weights of the generation
+		for (var g = 0; g < this.genomes.length; g++) {
+			tmpWeight.push(this.genomes[g].getWeights());
+		}
+
+		// Set all the weights to the tmp generation (copy)
+		for (var g = 0; g < this.genomes.length; g++) {
+			genClone.genomes[g].setWeights(tmpWeight[g]);
+		}
+
+		// Set the fitness
+		for (var i = 0; i < this.genomes.length; i++) {
+			genClone.genomes[i].setFitness(this.genomes[i].fitness);
+		}
 
 		// Select the best genomes [2 * (sqrt(nbOfGenomes) / 2)]
 		for (var i = 0; i < 2*Math.floor(Math.sqrt(this.genomes.length)/2); i++) { // Number of wanted genomes for breeding
-			max = 0;
+			max = -1;
 			// Check the best fitness
-			for (var j = 0; j < arrayClone.length; j++) {
+			for (var j = 0; j < genClone.genomes.length; j++) {
 				// If a genome as a higher score
-				if (max < arrayClone[j].fitness) {
-					max = arrayClone[j].fitness;
-					// Store the best genome
-					genomeToAppend = arrayClone[j];
+				if (max < genClone.genomes[j].fitness) {
+					max = genClone.genomes[j].fitness;
 
-					// Remove the genome from the copied array
-					arrayClone.splice(j, 1);
+					// Store the best genome
+					genomeToAppend = genClone.genomes[j];
+					indexToRemove = j;
+					//log(indexToRemove);
 				}
 			}
+			//log(arrayClone);
 			selected.push(genomeToAppend);
+
+			// Remove the genome from the copied array
+			//log(indexToRemove);
+			genClone.genomes.splice(indexToRemove, 1);
+			//log(genClone.genomes);
 		}
 
+		//log(selected);
 		this.crossover(selected);
 	}
 
@@ -105,14 +147,13 @@ class Generation {
 		
 		this.singlePointCrossover(pSelectedGenomes);
 		//create new gen
-
 	}
 
 	//
 	singlePointCrossover(pSelectedGenomes){
 		var children = [];
 		// Create a copy of the genomes
-		var genClone = new Generation(this.topology, this.numberOfGenomes, this.activationFunction);
+		var genClone = new Generation(this.topology, this.numberOfGenomes, this.activationFunction, this.rate);
 		var weights = [];
 
 		// Store all the weights in an array
@@ -120,8 +161,8 @@ class Generation {
 			weights.push(pSelectedGenomes[g].getWeights());
 		}
 
-		// For each genome
-		for (var genIndex = 0; genIndex < this.genomes.length; genIndex++) {
+		// For each genome minus the number of selected genomes divided by 2
+		for (var genIndex = 0; genIndex < this.genomes.length - (pSelectedGenomes.length / 2); genIndex++) {
 			//Pair of genome
 			for (var pairIndex = 0; pairIndex < pSelectedGenomes.length; pairIndex+=2) {
 				//Get the pair of genome
@@ -157,13 +198,34 @@ class Generation {
 			genClone.genomes[genIndex].setWeights(children[genIndex]);
 		}
 
+		// Random genomes
+		for (var genIndex = this.genomes.length - (pSelectedGenomes.length / 2); genIndex < this.genomes.length; genIndex++) {
+			genClone.genomes[genIndex] = new Genome(this.topology, this.activationFunction);
+		}
+
+		//log(pSelectedGenomes[0].getWeights());
+		//log(pSelectedGenomes[1].getWeights());
+		//log(genClone.genomes[0].getWeights());
+
 		// Assign the new generation
-		this.mutationWithRate(genClone.genomes);
-		//this.mutation(genClone.genomes);
+		this.mutation(genClone.genomes);
+	}
+
+	twoPointCrossover(pSelectedGenomes){
+
+	}
+
+	uniformCrossover(pSelectedGenomes, rate){
+
 	}
 
 	//
 	mutation(nextGenomes) {
+		this.mutationWithRate(nextGenomes);
+	}
+
+	//
+	mutationWithoutRate(nextGenomes) {
 		var weights = [];
 
 		// Store all the weights in an array
@@ -201,8 +263,10 @@ class Generation {
 
 			// Change the weights randomly
 			for (var i = 0; i < indexArray.length; i++) {
-
-				weights[genIndex][indexArray[i]] += Math.random() - 0.5;
+				weights[genIndex][indexArray[i]] *= this.weightVariation;
+				/*if (weights[genIndex][indexArray[i]] < 0) {
+					weights[genIndex][indexArray[i]] = 0;
+				}*/
 			}
 
 			// Apply the changes
@@ -230,7 +294,10 @@ class Generation {
 			// Change the weights randomly
 			for (var i = 0; i < weights[genIndex].length; i++) {
 				if (this.rate <= Math.random()) {
-					weights[genIndex][i] += Math.random() - 0.5;
+					weights[genIndex][i] *= this.weightVariation;
+					/*if (weights[genIndex][i] < 0) {
+						weights[genIndex][i] = 0;
+					}*/
 				}
 			}
 
@@ -238,14 +305,9 @@ class Generation {
 			nextGenomes[genIndex].setWeights(weights[genIndex]);
 		}
 
+		//log(nextGenomes[0].getWeights());
+		//log(this.genomes[0].getWeights());
+
 		this.genomes = nextGenomes;
 	}
-}
-
-function twoPointCrossover(breedA, breedB){
-
-}
-
-function uniformCrossover(breedA, breedB, rate){
-
 }
