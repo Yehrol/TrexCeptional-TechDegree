@@ -150,7 +150,7 @@ class NeuralNetwork {
 		neuronSize -= neuronSpace;
 
 		// Font
-		context.font = "30px Arial";
+		context.font = "10px Arial";
 
 		//
 		var spaceBetweenNeuronX = 0;
@@ -174,8 +174,7 @@ class NeuralNetwork {
 					for (var neuronIndex = 0; neuronIndex < this.layers[y+1].neurons.length; neuronIndex++) {
 						context.beginPath();
 						// Draw the text
-						log(this.layers[y]);
-						context.fillText(this.layers[y].neurons[neuronIndex].outputWeights[].weight,spaceBetweenNeuronY * (y+1) + neuronSize / 2, spaceBetweenNeuronX * (x+1) + neuronSize * x + neuronSize / 2);
+						context.fillText("123",spaceBetweenNeuronY * (y+1) + neuronSize / 2, spaceBetweenNeuronX * (x+1) + neuronSize * x + neuronSize / 2);//this.layers[y].neurons[x].outputWeights[neuronIndex].weight
 						// Draw the line
 						context.moveTo(spaceBetweenNeuronY * (y+1) + neuronSize / 2, spaceBetweenNeuronX * (x+1) + neuronSize * x + neuronSize / 2);
 						context.lineTo(spaceBetweenNeuronY * (y+2) - neuronSize / 2, nextSpaceBetweenNeuronX * (neuronIndex+1) + neuronSize * neuronIndex + neuronSize / 2);

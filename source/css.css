@@ -112,14 +112,14 @@ html, body {
   }
 }
 
-@media (min-height: 240px) and (orientation: landscape) {
+/*@media (min-height: 240px) and (orientation: landscape) {
   .offline .interstitial-wrapper {
     margin-bottom: 90px;
   }
   .icon-offline {
     margin-bottom: 20px;
   }
-}
+}*/
 
 @media (max-height: 320px) and (orientation: landscape) {
   .icon-offline {
