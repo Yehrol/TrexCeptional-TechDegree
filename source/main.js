@@ -11,7 +11,7 @@ var runner;
 
 var gen;
 var numberOfGenomes = 12; //Genomes per generation [minimum 4]
-var mutationRate = 0.3;
+var mutationRate = 0.2;
 var topology
 
 var FPS = 60;
@@ -25,6 +25,11 @@ var maxVelocity;
 var maxDistance;
 var maxYPosition;
 var maxSize;
+
+// Canvas
+var c = document.getElementById("neuralNet");
+var ctx = c.getContext("2d");
+//ctx.translate(0.5, 0.5);
 
 // When the page is fully loaded
 $(document).ready(function(){
@@ -60,7 +65,7 @@ $(document).ready(function(){
 
     // Main code
     //topology = [4,3,1];
-    topology = [1,3,1];
+    topology = [4,3,1];
     gen = new Generation(topology, numberOfGenomes, new sigmoid(), mutationRate);
     //neural_net = new NeuralNetwork(topology, new tanh());
     
@@ -73,10 +78,6 @@ $(document).ready(function(){
 
 
 	}, 1000 / FPS);
-
-	/*var c = document.getElementById("neuralNet");
-	var ctx = c.getContext("2d");*/
-
 
     /*var input = [23,43,54,86];
     neural_net.feedForward(input);
@@ -121,7 +122,7 @@ function startIA(pVelocity,pDistance,pYPosition,pSize) {
 	// Check if the AI should "work"
 	if (isRunning == true) {
 		/***************temporaire (debugage)***************/
-		var neuralNetPreview = ""
+		/*var neuralNetPreview = ""
 
 		for (var i = 0; i < topology.length; i++) {
 			neuralNetPreview += "<div class='col s4 m4 l4'><ul>";
@@ -133,8 +134,11 @@ function startIA(pVelocity,pDistance,pYPosition,pSize) {
 			neuralNetPreview += "</ul></div>";
 		}
 
-		$("#neuralNetPreview").html(neuralNetPreview);
+		$("#neuralNetPreview").html(neuralNetPreview);*/
 		/***************temporaire (debugage)***************/
+
+ctx.clearRect(0,0,800,300);
+		gen.drawNeuralNet(c,ctx);
 
 		// timer
 		test++;
@@ -160,7 +164,7 @@ function startIA(pVelocity,pDistance,pYPosition,pSize) {
 			// Restart the game
 			restartGame();
 
-			$("#neuralNetPreview").html("");
+			//$("#neuralNetPreview").html("");
 
 			// Check if the game as restarted before changing generation
 			if (!runner.crashed) {
@@ -174,6 +178,7 @@ function startIA(pVelocity,pDistance,pYPosition,pSize) {
 				// Update the interface
 				$('#generationIndex').html(gen.generation);
 				$('#genomeIndex').html(gen.currentGenome + 1);
+				$("#decision").html(0);
 			}
 		}
 	}

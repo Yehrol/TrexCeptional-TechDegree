@@ -17,7 +17,7 @@ class Generation {
 		this.generation = 0;
 		this.currentGenome = 0;
 		this.rate = pRate;
-		this.weightVariation = (Math.random() - 0.5) * 3 + (Math.random() - 0.5); //Math.random() * 1.5 - 0.5; // [-0.5...1]
+		this.weightVariation = Math.random() - 0.5; //[-0.5...0.5] ---- (Math.random() - 0.5) * 3 + (Math.random() - 0.5)
 
 		// Forced to store them to create a new object from the object
 		this.topology = pTopology;
@@ -58,7 +58,7 @@ class Generation {
 		}*/
 		var result = this.genomes[this.currentGenome].getOutput();
 		$("#decision").html(result.toFixed(4));
-		if (result > 0.75) { // greater than 0.6 [press up]
+		if (result > 0.5) { // greater than 0.5 [press up]
 			simulateKeyPress(38, "keydown");
 		} 
 		else if (result < 0.40) { // less than 0.4 [press down]
@@ -263,7 +263,7 @@ class Generation {
 
 			// Change the weights randomly
 			for (var i = 0; i < indexArray.length; i++) {
-				weights[genIndex][indexArray[i]] *= this.weightVariation;
+				weights[genIndex][indexArray[i]] += this.weightVariation;
 				/*if (weights[genIndex][indexArray[i]] < 0) {
 					weights[genIndex][indexArray[i]] = 0;
 				}*/
@@ -294,7 +294,7 @@ class Generation {
 			// Change the weights randomly
 			for (var i = 0; i < weights[genIndex].length; i++) {
 				if (this.rate <= Math.random()) {
-					weights[genIndex][i] *= this.weightVariation;
+					weights[genIndex][i] += this.weightVariation;
 					/*if (weights[genIndex][i] < 0) {
 						weights[genIndex][i] = 0;
 					}*/
@@ -309,5 +309,9 @@ class Generation {
 		//log(this.genomes[0].getWeights());
 
 		this.genomes = nextGenomes;
+	}
+
+	drawNeuralNet(canvas,context) {
+		this.genomes[this.currentGenome].drawNeuralNet(canvas,context);
 	}
 }

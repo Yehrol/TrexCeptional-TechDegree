@@ -30,4 +30,8 @@ class Genome {
 	getOutput() {
 		return this.neuralNet.getOutput();
 	}
+
+	drawNeuralNet(canvas,context) {
+		this.neuralNet.drawNeuralNet(canvas,context);
+	}
 }

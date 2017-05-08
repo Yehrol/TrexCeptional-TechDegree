@@ -9,7 +9,7 @@ class Connection {
 	// Constructor
 	constructor(pWeight) {
 		// Create the initial weight
-		this.weight = this.randomWeight(0,1);
+		this.weight = this.randomWeight(-1,1);
 		
 		this.deltaWeight;
 	}

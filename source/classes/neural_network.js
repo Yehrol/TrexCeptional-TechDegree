@@ -124,4 +124,68 @@ class NeuralNetwork {
 	getOutput() {
 		return this.layers[this.layers.length - 1].neurons[0].outputValue;
 	}
+
+	drawNeuralNet(canvas,context) {
+		// The size in pixel for a neuron
+		var neuronSize = 0;
+		var neuronSpace = 10;
+
+		// Get the biggest number of neuron per layer
+		var maxNeuron = 0;
+		for (var i = 0; i < this.layers.length; i++) {
+			if (this.layers[i].neurons.length > maxNeuron) {
+				maxNeuron = this.layers[i].neurons.length;
+			}
+		}
+
+		// Get the lowest size (used to create circle)
+		if ((canvas.height / maxNeuron) < (canvas.width / this.layers.length)) {
+			neuronSize = (canvas.height / maxNeuron);
+		}
+		else {
+			neuronSize = canvas.width / this.layers.length;
+		}
+
+		//
+		neuronSize -= neuronSpace;
+
+		// Font
+		context.font = "30px Arial";
+
+		//
+		var spaceBetweenNeuronX = 0;
+		var spaceBetweenNeuronY = 0;
+		for (var y = 0; y < this.layers.length; y++) {
+			// Get the size between neuron [Y axis]
+			spaceBetweenNeuronY = canvas.width / (this.layers.length + 1);
+			for (var x = 0; x < this.layers[y].neurons.length; x++) {
+				// Get the size between neuron [X axis]
+				spaceBetweenNeuronX = (canvas.height - (this.layers[y].neurons.length * neuronSize)) / (this.layers[y].neurons.length + 1)
+
+				// Draw the circle
+				context.beginPath();
+				context.arc(spaceBetweenNeuronY * (y+1), spaceBetweenNeuronX * (x+1) + neuronSize * x + neuronSize / 2, neuronSize / 2, 0, 2 * Math.PI);
+				context.stroke();
+				context.closePath();
+
+				// Draw the line
+				if (y + 1 < this.layers.length) {
+					var nextSpaceBetweenNeuronX = (canvas.height - (this.layers[y+1].neurons.length * neuronSize)) / (this.layers[y+1].neurons.length + 1);
+					for (var neuronIndex = 0; neuronIndex < this.layers[y+1].neurons.length; neuronIndex++) {
+						context.beginPath();
+						// Draw the text
+						log(this.layers[y]);
+						context.fillText(this.layers[y].neurons[neuronIndex].outputWeights[].weight,spaceBetweenNeuronY * (y+1) + neuronSize / 2, spaceBetweenNeuronX * (x+1) + neuronSize * x + neuronSize / 2);
+						// Draw the line
+						context.moveTo(spaceBetweenNeuronY * (y+1) + neuronSize / 2, spaceBetweenNeuronX * (x+1) + neuronSize * x + neuronSize / 2);
+						context.lineTo(spaceBetweenNeuronY * (y+2) - neuronSize / 2, nextSpaceBetweenNeuronX * (neuronIndex+1) + neuronSize * neuronIndex + neuronSize / 2);
+						context.stroke();
+					}
+				}
+
+				//NEED TO ADD THE WEIGHTS
+
+			}
+		}
+	}
 }
