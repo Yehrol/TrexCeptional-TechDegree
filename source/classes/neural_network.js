@@ -210,6 +210,7 @@ class NeuralNetwork {
 						//PROBLEM HERE !!!!
 						//log(this.layers[y].neurons[x].outputWeights[neuronIndex]);
 						//log(this.layers[y].neurons[x]);
+						log(this.layers);
 						context.fillText(this.layers[y].neurons[x].outputWeights[neuronIndex].weight.toFixed(3),linePosY - yPourcent, posX - xPourcent);
 					}
 				}

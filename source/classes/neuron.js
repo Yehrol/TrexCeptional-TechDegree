@@ -42,7 +42,6 @@ class Neuron {
 		for (var i = 0; i < this.outputWeights.length; i++) {
 			weights.push(this.outputWeights[i].getWeight());
 		}
-		//log(ravel(weights));
 		return ravel(weights); //weights
 	}
 

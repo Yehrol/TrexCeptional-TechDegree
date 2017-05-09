@@ -258,8 +258,9 @@ function importNeuralNetwork(){
 // Transform a multidimensionnal array into an 1 dimension array
 function ravel(array) {
 	var result = new Array();
-	log(array);
-	if (typeof array[0] == "undefined") {
+	//log(typeof array[0]);
+	//log(array[0]);
+	if (typeof array[0] == "undefined" || typeof array[0] == "number") {//TO CHANGE
 		result = array;
 	}
 	else {
