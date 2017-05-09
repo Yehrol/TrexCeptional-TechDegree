@@ -104,6 +104,8 @@ class Generation {
 			tmpWeight.push(this.genomes[g].getWeights());
 		}
 
+		//log(this.genomes);
+
 		// Set all the weights to the tmp generation (copy)
 		for (var g = 0; g < this.genomes.length; g++) {
 			genClone.genomes[g].setWeights(tmpWeight[g]);

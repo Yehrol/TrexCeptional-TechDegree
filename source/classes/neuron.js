@@ -12,7 +12,7 @@ class Neuron {
 		this.numberOfOutputs = pNumberOfOutputs;
 
 		// Store the output value
-		this.outputValue;
+		this.outputValue = 1;
 
 		// Store the connections
 		this.outputWeights = [];
@@ -37,11 +37,13 @@ class Neuron {
 	}
 
 	getWeights() {
+		//log(this.outputWeights);
 		var weights = [];
 		for (var i = 0; i < this.outputWeights.length; i++) {
 			weights.push(this.outputWeights[i].getWeight());
 		}
-		return weights;
+		//log(ravel(weights));
+		return ravel(weights); //weights
 	}
 
 	setWeights(pWeights) {

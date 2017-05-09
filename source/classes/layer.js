@@ -22,7 +22,7 @@ class Layer {
 
 	getWeights() {
 		var weights = [];
-		for (var i = 0; i < this.neurons.length - this.numberOfBias; i++) {
+		for (var i = 0; i < this.neurons.length; i++) {//- this.numberOfBias
 			weights.push(this.neurons[i].getWeights());
 		}
 		return ravel(weights);

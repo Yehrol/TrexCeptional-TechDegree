@@ -10,7 +10,7 @@ var isRunning = false;
 var runner;
 
 var gen;
-var numberOfGenomes = 12; //Genomes per generation [minimum 4]
+var numberOfGenomes = 4; //Genomes per generation [minimum 4]
 var mutationRate = 0.2;
 var topology
 
@@ -65,7 +65,7 @@ $(document).ready(function(){
 
     // Main code
     //topology = [4,3,1];
-    topology = [4,3,1];
+    topology = [1,2,1];
     gen = new Generation(topology, numberOfGenomes, new sigmoid(), mutationRate);
     //neural_net = new NeuralNetwork(topology, new tanh());
     
@@ -137,7 +137,6 @@ function startIA(pVelocity,pDistance,pYPosition,pSize) {
 		$("#neuralNetPreview").html(neuralNetPreview);*/
 		/***************temporaire (debugage)***************/
 
-ctx.clearRect(0,0,800,300);
 		gen.drawNeuralNet(c,ctx);
 
 		// timer
@@ -187,6 +186,7 @@ ctx.clearRect(0,0,800,300);
 //
 function restartGame() {
 	simulateKeyPress(38, "keyup");
+	ctx.clearRect(0,0,c.width,c.height);
 }
 
 // Simulate a key press
@@ -258,7 +258,7 @@ function importNeuralNetwork(){
 // Transform a multidimensionnal array into an 1 dimension array
 function ravel(array) {
 	var result = new Array();
-
+	log(array);
 	if (typeof array[0] == "undefined") {
 		result = array;
 	}

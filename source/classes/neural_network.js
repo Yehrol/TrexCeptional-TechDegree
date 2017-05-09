@@ -99,7 +99,7 @@ class NeuralNetwork {
 		}
 
 		// calculate gradients on hidden layers
-		for (var layerNum = this.layers.length - this.layers.numberOfBias; layerNum > 0; layerNum--) {
+		for (var layerNum = this.layers.length; layerNum > 0; layerNum--) {// - this.layers.numberOfBias
 			var currentLayer = this.layers[layerNum];
 			var previousLayer = this.layers[layerNum - 1];
 
@@ -129,6 +129,8 @@ class NeuralNetwork {
 		// The size in pixel for a neuron
 		var neuronSize = 0;
 		var neuronSpace = 10;
+		var spaceFromBorder = 50;
+		var pourcent = 15;
 
 		// Get the biggest number of neuron per layer
 		var maxNeuron = 0;
@@ -149,41 +151,70 @@ class NeuralNetwork {
 		//
 		neuronSize -= neuronSpace;
 
-		// Font
-		context.font = "10px Arial";
+		context.clearRect(0,0,canvas.width,canvas.height);
 
 		//
 		var spaceBetweenNeuronX = 0;
 		var spaceBetweenNeuronY = 0;
 		for (var y = 0; y < this.layers.length; y++) {
 			// Get the size between neuron [Y axis]
-			spaceBetweenNeuronY = canvas.width / (this.layers.length + 1);
+			spaceBetweenNeuronY = ((canvas.width - (spaceFromBorder * 2)) / (this.layers.length - 1)) - neuronSize / 2;
 			for (var x = 0; x < this.layers[y].neurons.length; x++) {
 				// Get the size between neuron [X axis]
-				spaceBetweenNeuronX = (canvas.height - (this.layers[y].neurons.length * neuronSize)) / (this.layers[y].neurons.length + 1)
+				spaceBetweenNeuronX = ((canvas.height - (this.layers[y].neurons.length * neuronSize)) / (this.layers[y].neurons.length + 1));
+
+				var posY = spaceBetweenNeuronY * y + spaceFromBorder + neuronSize / 2;
+				var posX = spaceBetweenNeuronX * (x+1) + neuronSize * x + neuronSize / 2;
 
 				// Draw the circle
 				context.beginPath();
-				context.arc(spaceBetweenNeuronY * (y+1), spaceBetweenNeuronX * (x+1) + neuronSize * x + neuronSize / 2, neuronSize / 2, 0, 2 * Math.PI);
+				context.arc(posY, posX, neuronSize / 2, 0, 2 * Math.PI);
 				context.stroke();
 				context.closePath();
+
+				// Draw the output values of each neuron
+				context.font = "20px Arial";
+				//log(this.layers[y].neurons[x]);
+				context.fillText(this.layers[y].neurons[x].outputValue.toFixed(3),posY - (context.measureText(this.layers[y].neurons[x].outputValue.toFixed(3)).width / 2), posX + 10);
 
 				// Draw the line
 				if (y + 1 < this.layers.length) {
 					var nextSpaceBetweenNeuronX = (canvas.height - (this.layers[y+1].neurons.length * neuronSize)) / (this.layers[y+1].neurons.length + 1);
-					for (var neuronIndex = 0; neuronIndex < this.layers[y+1].neurons.length; neuronIndex++) {
-						context.beginPath();
-						// Draw the text
-						context.fillText("123",spaceBetweenNeuronY * (y+1) + neuronSize / 2, spaceBetweenNeuronX * (x+1) + neuronSize * x + neuronSize / 2);//this.layers[y].neurons[x].outputWeights[neuronIndex].weight
+					for (var neuronIndex = 0; neuronIndex < this.layers[y+1].neurons.length - 1; neuronIndex++) {
+
 						// Draw the line
-						context.moveTo(spaceBetweenNeuronY * (y+1) + neuronSize / 2, spaceBetweenNeuronX * (x+1) + neuronSize * x + neuronSize / 2);
-						context.lineTo(spaceBetweenNeuronY * (y+2) - neuronSize / 2, nextSpaceBetweenNeuronX * (neuronIndex+1) + neuronSize * neuronIndex + neuronSize / 2);
+						var linePosY = posY + neuronSize / 2;
+						var nextPosY = spaceBetweenNeuronY * (y+1) + spaceFromBorder;
+						var nextPosX = nextSpaceBetweenNeuronX * (neuronIndex+1) + neuronSize * neuronIndex + neuronSize / 2;
+
+						var yPourcent = Math.ceil(Math.ceil(linePosY - nextPosY) / 100 * pourcent);
+						var xPourcent = Math.ceil(Math.ceil(posX - nextPosX) / 100 * pourcent);
+
+						context.beginPath();
+
+						// Draw the line
+						context.moveTo(linePosY, posX);
+						context.lineTo(nextPosY, nextPosX);
 						context.stroke();
+
+						// Change the font
+						context.font = "12px Arial";
+
+						// Rect behind the text
+						context.fillStyle="#FFFFFF";
+						context.fillRect(linePosY - yPourcent - 2, posX - xPourcent - 11, 38, 13);
+
+						// Draw the weight
+						context.fillStyle="#000000";
+
+						//PROBLEM HERE !!!!
+						//log(this.layers[y].neurons[x].outputWeights[neuronIndex]);
+						//log(this.layers[y].neurons[x]);
+						context.fillText(this.layers[y].neurons[x].outputWeights[neuronIndex].weight.toFixed(3),linePosY - yPourcent, posX - xPourcent);
 					}
 				}
 
 				//NEED TO ADD THE WEIGHTS
-
 			}
 		}
 	}

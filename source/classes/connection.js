@@ -7,7 +7,7 @@
 
 class Connection {
 	// Constructor
-	constructor(pWeight) {
+	constructor() {
 		// Create the initial weight
 		this.weight = this.randomWeight(-1,1);
 		
