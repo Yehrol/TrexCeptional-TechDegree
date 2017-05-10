@@ -10,7 +10,7 @@ var isRunning = false;
 var runner;
 
 var gen;
-var numberOfGenomes = 4; //Genomes per generation [minimum 4]
+var numberOfGenomes = 12; //Genomes per generation [minimum 4]
 var mutationRate = 0.2;
 var topology
 
@@ -65,9 +65,13 @@ $(document).ready(function(){
 
     // Main code
     //topology = [4,3,1];
-    topology = [1,2,1];
+    topology = [2,4,1];
     gen = new Generation(topology, numberOfGenomes, new sigmoid(), mutationRate);
-    //neural_net = new NeuralNetwork(topology, new tanh());
+
+	// Update the interface
+	$('#generationIndex').html(gen.generation);
+	$('#genomeIndex').html(gen.currentGenome + 1 + "/" + numberOfGenomes);
+	$("#decision").html(0);
     
     //
 	setInterval(function(){
@@ -121,21 +125,6 @@ function startIA(pVelocity,pDistance,pYPosition,pSize) {
 
 	// Check if the AI should "work"
 	if (isRunning == true) {
-		/***************temporaire (debugage)***************/
-		/*var neuralNetPreview = ""
-
-		for (var i = 0; i < topology.length; i++) {
-			neuralNetPreview += "<div class='col s4 m4 l4'><ul>";
-			for (var j = 0; j < topology[i]; j++) {
-				for (var h = 0; h < gen.genomes[gen.currentGenome].neuralNet.layers[i].neurons[j].outputWeights.length; h++) {
-					neuralNetPreview += "<li>" + gen.genomes[gen.currentGenome].neuralNet.layers[i].neurons[j].outputWeights[h].weight + "</li>";
-				}
-			}
-			neuralNetPreview += "</ul></div>";
-		}
-
-		$("#neuralNetPreview").html(neuralNetPreview);*/
-		/***************temporaire (debugage)***************/
 
 		gen.drawNeuralNet(c,ctx);
 
@@ -176,7 +165,7 @@ function startIA(pVelocity,pDistance,pYPosition,pSize) {
 
 				// Update the interface
 				$('#generationIndex').html(gen.generation);
-				$('#genomeIndex').html(gen.currentGenome + 1);
+				$('#genomeIndex').html(gen.currentGenome + 1 + "/" + numberOfGenomes);
 				$("#decision").html(0);
 			}
 		}

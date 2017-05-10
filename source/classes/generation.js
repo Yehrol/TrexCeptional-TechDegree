@@ -17,7 +17,7 @@ class Generation {
 		this.generation = 0;
 		this.currentGenome = 0;
 		this.rate = pRate;
-		this.weightVariation = Math.random() - 0.5; //[-0.5...0.5] ---- (Math.random() - 0.5) * 3 + (Math.random() - 0.5)
+		//this.weightVariation = Math.random() - 0.5; //[-0.5...0.5] ---- (Math.random() - 0.5) * 3 + (Math.random() - 0.5)
 
 		// Forced to store them to create a new object from the object
 		this.topology = pTopology;
@@ -37,7 +37,7 @@ class Generation {
 	    var normalizedSize = pSize / maxSize;
 
 		// Create the input array for the neural network
-		var input = [normalizedDistance];//normalizedVelocity,,normalizedYPosition,normalizedSize
+		var input = [normalizedDistance,normalizedYPosition];//normalizedVelocity,,normalizedSize
 		//log("velocity : " + normalizedVelocity);
 		//log("distance : " + normalizedDistance);
 		//log("y position : " + normalizedYPosition);
@@ -58,10 +58,10 @@ class Generation {
 		}*/
 		var result = this.genomes[this.currentGenome].getOutput();
 		$("#decision").html(result.toFixed(4));
-		if (result > 0.5) { // greater than 0.5 [press up]
+		if (result > 0.6) { // greater than 0.5 [press up]
 			simulateKeyPress(38, "keydown");
 		} 
-		else if (result < 0.40) { // less than 0.4 [press down]
+		else if (result < 0.4) { // less than 0.4 [press down]
 			simulateKeyPress(40, "keydown");
 		}
 	}
@@ -110,6 +110,7 @@ class Generation {
 		for (var g = 0; g < this.genomes.length; g++) {
 			genClone.genomes[g].setWeights(tmpWeight[g]);
 		}
+		//
 
 		// Set the fitness
 		for (var i = 0; i < this.genomes.length; i++) {
@@ -140,7 +141,6 @@ class Generation {
 			//log(genClone.genomes);
 		}
 
-		//log(selected);
 		this.crossover(selected);
 	}
 
@@ -200,7 +200,7 @@ class Generation {
 			genClone.genomes[genIndex].setWeights(children[genIndex]);
 		}
 
-		// Random genomes
+		// Generate a random genomes
 		for (var genIndex = this.genomes.length - (pSelectedGenomes.length / 2); genIndex < this.genomes.length; genIndex++) {
 			genClone.genomes[genIndex] = new Genome(this.topology, this.activationFunction);
 		}
@@ -265,7 +265,7 @@ class Generation {
 
 			// Change the weights randomly
 			for (var i = 0; i < indexArray.length; i++) {
-				weights[genIndex][indexArray[i]] += this.weightVariation;
+				weights[genIndex][indexArray[i]] += Math.random() - 0.5;
 				/*if (weights[genIndex][indexArray[i]] < 0) {
 					weights[genIndex][indexArray[i]] = 0;
 				}*/
@@ -296,7 +296,7 @@ class Generation {
 			// Change the weights randomly
 			for (var i = 0; i < weights[genIndex].length; i++) {
 				if (this.rate <= Math.random()) {
-					weights[genIndex][i] += this.weightVariation;
+					weights[genIndex][i] += Math.random() * 0.4 - 0.20; // [-0.2...0.2]
 					/*if (weights[genIndex][i] < 0) {
 						weights[genIndex][i] = 0;
 					}*/

@@ -64,12 +64,15 @@ class NeuralNetwork {
 			var nextLayerLength = 1;
 			var nbBias = this.layers[i].numberOfBias;
 
+			// If this is the last layer
 			if (typeof this.layers[i+1] != "undefined") {
 				nbBias = this.layers[i+1].numberOfBias;
-				nextLayerLength = this.layers[i+1].neurons.length - nbBias;
+				nextLayerLength = this.layers[i+1].neurons.length;
 			}
 			
-			var nbOfNeuronsInLayer = (this.layers[i].neurons.length - nbBias) * nextLayerLength;
+			nextLayerLength -= nbBias;
+
+			var nbOfNeuronsInLayer = (this.layers[i].neurons.length) * nextLayerLength;
 			this.layers[i].setWeights(pWeights.slice(pos, pos + nbOfNeuronsInLayer), nextLayerLength);
 			pos+=nbOfNeuronsInLayer;
 		}
@@ -166,6 +169,18 @@ class NeuralNetwork {
 				var posY = spaceBetweenNeuronY * y + spaceFromBorder + neuronSize / 2;
 				var posX = spaceBetweenNeuronX * (x+1) + neuronSize * x + neuronSize / 2;
 
+				// Change the color if this is the bias
+				if (x == this.layers[y].neurons.length - 1) {
+					context.fillStyle="#BDBDBD";
+					context.strokeStyle="#BDBDBD";
+				}
+				else {
+					context.fillStyle="#ee6e73";
+					context.strokeStyle="#ee6e73";
+				}
+
+				context.lineWidth=1.5;
+
 				// Draw the circle
 				context.beginPath();
 				context.arc(posY, posX, neuronSize / 2, 0, 2 * Math.PI);
@@ -175,6 +190,7 @@ class NeuralNetwork {
 				// Draw the output values of each neuron
 				context.font = "20px Arial";
 				//log(this.layers[y].neurons[x]);
+
 				context.fillText(this.layers[y].neurons[x].outputValue.toFixed(3),posY - (context.measureText(this.layers[y].neurons[x].outputValue.toFixed(3)).width / 2), posX + 10);
 
 				// Draw the line
@@ -210,7 +226,7 @@ class NeuralNetwork {
 						//PROBLEM HERE !!!!
 						//log(this.layers[y].neurons[x].outputWeights[neuronIndex]);
 						//log(this.layers[y].neurons[x]);
-						log(this.layers);
+						//log(this.layers);
 						context.fillText(this.layers[y].neurons[x].outputWeights[neuronIndex].weight.toFixed(3),linePosY - yPourcent, posX - xPourcent);
 					}
 				}
