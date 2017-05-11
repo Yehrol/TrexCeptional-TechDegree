@@ -19,7 +19,7 @@ class Generation {
 		this.rate = pRate;
 		//this.weightVariation = Math.random() - 0.5; //[-0.5...0.5] ---- (Math.random() - 0.5) * 3 + (Math.random() - 0.5)
 
-		// Forced to store them to create a new object from the object
+		// Forced to store them to create a new object from the object himself
 		this.topology = pTopology;
 		this.activationFunction = pActivationFunction;
 
@@ -37,7 +37,7 @@ class Generation {
 	    var normalizedSize = pSize / maxSize;
 
 		// Create the input array for the neural network
-		var input = [normalizedDistance,normalizedYPosition];//normalizedVelocity,,normalizedSize
+		var input = [normalizedDistance];//normalizedVelocity,,normalizedSize,normalizedYPosition
 		//log("velocity : " + normalizedVelocity);
 		//log("distance : " + normalizedDistance);
 		//log("y position : " + normalizedYPosition);
@@ -47,15 +47,6 @@ class Generation {
     	this.genomes[this.currentGenome].feedForward(input);
 
 		// Check which move the AI should do
-		/*if (this.genomes[this.currentGenome].neuralNet.getOutput() > 0.7) { // greater than 0.6 [press up]
-			simulateKeyPress(38, "keydown");
-		}
-		else if (this.genomes[this.currentGenome].neuralNet.getOutput() >= 0.4 && this.genomes[this.currentGenome].neuralNet.getOutput() <= 0.6) { // between 0.4 and 0.6 (both include) [do nothing]
-			// do nothing
-		} 
-		else if (this.genomes[this.currentGenome].neuralNet.getOutput() < 0.3) { // less than 0.4 [press down]
-			simulateKeyPress(40, "keydown");
-		}*/
 		var result = this.genomes[this.currentGenome].getOutput();
 		$("#decision").html(result.toFixed(4));
 		if (result > 0.6) { // greater than 0.5 [press up]
@@ -64,10 +55,13 @@ class Generation {
 		else if (result < 0.4) { // less than 0.4 [press down]
 			simulateKeyPress(40, "keydown");
 		}
+		else {
+			//do nothing
+		}
 	}
 
 	//
-	nextGen(pFitness) {
+	nextGen(pFitness, pFitnessChart) {
 		// Store the score of the current genome
 		this.genomes[this.currentGenome].setFitness(pFitness);
 
@@ -79,6 +73,8 @@ class Generation {
 			// Change the generation
 			this.generation++;
 
+			addDataToChart(pFitnessChart,this.getFitnessAverage());
+
 			// Do crossover
 			this.selection();
 		}
@@ -87,6 +83,19 @@ class Generation {
 		}
 	}
 
+	//
+	getFitnessAverage() {
+		// Get the fitness average of the generation
+		var fitnessAverage = 0;
+		for (var i = 0; i < this.genomes.length; i++) {
+			fitnessAverage += this.genomes[i].fitness;
+		}
+		fitnessAverage /= this.genomes.length;
+
+		return fitnessAverage;
+	}
+
+	//
 	selection() {
 		// Store the best genome
 		var selected = [];
@@ -296,10 +305,7 @@ class Generation {
 			// Change the weights randomly
 			for (var i = 0; i < weights[genIndex].length; i++) {
 				if (this.rate <= Math.random()) {
-					weights[genIndex][i] += Math.random() * 0.4 - 0.20; // [-0.2...0.2]
-					/*if (weights[genIndex][i] < 0) {
-						weights[genIndex][i] = 0;
-					}*/
+					weights[genIndex][i] += Math.random() * 0.4 - 0.2; // [-0.2...0.2]
 				}
 			}
 

@@ -22,77 +22,87 @@
             </div>
         </nav>
 
-        <div class="container">
-            <div class="row">
-            
-                <div class="col s12 m12 l3">
-                    <div class="card-panel">
-                        <h5>Informations</h5>
-                        <div class="card-content">
-                            <div class="card-panel grey lighten-2">
-                                <h5>Network infos</h5>
-                                <div class="card-content">
-                                    <ul>
-                                        <li>Generation : <span id="generationIndex">X</span></li>
-                                        <li>Genome : <span id="genomeIndex">X</span></li>
-                                        <li>Time passed [s] : <span id="timeIndex">0</span></li>
-                                        <li>T-Rex decision : <span id="decision">X</span></li>
-                                    </ul>
-                                </div>
-                            </div>
-                            <div class="card-panel grey lighten-2">
-                                <h5>T-Rex values</h5>
-                                <div class="card-content">
-                                    <ul>
-                                        <li>Distance : <span id="Distance">X</span></li>
-                                        <li>Y position : <span id="yPosition">X</span></li>
-                                        <li>Velocity : <span id="Velocity">X</span></li>
-                                        <li>Size : <span id="Size">X</span></li>
-                                    </ul>
-                                </div>
-                            </div>
-                            <div class="card-panel grey lighten-2">
-                                <h5>Controls</h5>
-                                <div class="card-content">
-                                    <div class="card-content">
-                                        <img src="assets/added/up.png" alt="input" class="responsive-img">
-                                        <img src="assets/added/down.png" alt="input" class="responsive-img">
-                                    </div>
-                                </div>
-                            </div>
-                            <button class="btn waves-effect waves-light" type="button" id="stateBtn" onclick="changeRunningState();">START
-                                <i class="material-icons right">power_settings_new</i>
-                            </button>
-                        </div>
-                    </div>
-                </div>
+    <div class="container">
 
-                <div class="col s12 m12 l9">
-                    <div class="col s12 m12 l12">
-                        <div class="card-panel">
-                            <h5>Game</h5>
+        <div class="row">
+        
+            <div class="col s12 m12 l2">
+                <div class="card-panel">
+                    <h5>Informations</h5>
+                    <div class="card-content">
+                        <div class="card-panel grey lighten-2">
+                            <h5>Network infos</h5>
                             <div class="card-content">
-                                <div id="main-frame-error" class="interstitial-wrapper">
-                                    <div id="main-content">
-                                        <div class="icon icon-offline" alt=""></div>
-                                    </div>
-                                    <div id="offline-resources">
-                                        <img id="offline-resources-1x" src="assets/default_100_percent/100-offline-sprite.png">
-                                        <img id="offline-resources-2x" src="assets/default_200_percent/200-offline-sprite.png">
-                                    </div>
+                                <ul>
+                                    <li>Generation : <span id="generationIndex">X</span></li>
+                                    <li>Genome : <span id="genomeIndex">X</span></li>
+                                    <li>Time passed [s] : <span id="timeIndex">0</span></li>
+                                    <li>T-Rex decision : <span id="decision">X</span></li>
+                                </ul>
+                            </div>
+                        </div>
+                        <div class="card-panel grey lighten-2">
+                            <h5>T-Rex values</h5>
+                            <div class="card-content">
+                                <ul>
+                                    <li>Distance : <span id="Distance">X</span></li>
+                                    <li>Y position : <span id="yPosition">X</span></li>
+                                    <li>Velocity : <span id="Velocity">X</span></li>
+                                    <li>Size : <span id="Size">X</span></li>
+                                </ul>
+                            </div>
+                        </div>
+                        <!--<div class="card-panel grey lighten-2">
+                            <h5>Controls</h5>
+                            <div class="card-content">
+                                <div class="card-content">
+                                    <img src="assets/added/up.png" alt="input" class="responsive-img">
+                                    <img src="assets/added/down.png" alt="input" class="responsive-img">
+                                </div>
+                            </div>
+                        </div>-->
+                        <button class="btn waves-effect waves-light" type="button" id="stateBtn" onclick="changeRunningState();">START
+                            <i class="material-icons right">power_settings_new</i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col s12 m12 l6">
+                <div class="col s12 m12 l12">
+                    <div class="card-panel">
+                        <h5>Game</h5>
+                        <div class="card-content">
+                            <div id="main-frame-error" class="interstitial-wrapper">
+                                <div id="main-content">
+                                    <div class="icon icon-offline" alt=""></div>
+                                </div>
+                                <div id="offline-resources">
+                                    <img id="offline-resources-1x" src="assets/default_100_percent/100-offline-sprite.png">
+                                    <img id="offline-resources-2x" src="assets/default_200_percent/200-offline-sprite.png">
                                 </div>
                             </div>
                         </div>
                     </div>
-
-                    <div class="col s12 m12 l12">
-                        <div class="card-panel" id="neuralNetPreview">
-                            <canvas id="neuralNet" width="800" height="400" style="border:1px solid #d3d3d3;"></canvas>
-                        </div>
-                    </div>
                 </div>
 
+                <div class="col s12 m12 l12">
+                    <div class="card-panel" id="neuralNetPreview">
+                        <canvas id="neuralNet" width="710" height="400" style="border:1px solid #d3d3d3;"></canvas>
+                    </div>
+                </div>
             </div>
+
+            <div class="col s12 m12 l4">
+                <div class="col s12 m12 l12">
+                    <div class="card-panel">
+                        <canvas id="Chart" width="400" height="400"></canvas>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
         </div>
         
         <!-- Toolbar -->
@@ -190,6 +200,7 @@
 
     <!-- SCRIPTS -->
     <script src="libraries/jQuery/jquery-3.2.1.min.js"></script>
+    <script src="libraries/chartJS/Chart.js"></script>
     <script type="text/javascript" src="libraries/materialize/js/materialize.min.js"></script>
 
     <script src="classes/neural_network.js"></script>

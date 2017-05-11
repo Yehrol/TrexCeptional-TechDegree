@@ -10,7 +10,7 @@ var isRunning = false;
 var runner;
 
 var gen;
-var numberOfGenomes = 12; //Genomes per generation [minimum 4]
+var numberOfGenomes = 4; //Genomes per generation [minimum 4]
 var mutationRate = 0.2;
 var topology
 
@@ -26,10 +26,15 @@ var maxDistance;
 var maxYPosition;
 var maxSize;
 
+// Reference to the fitness chart
+var fitnessChart;
+
 // Canvas
 var c = document.getElementById("neuralNet");
 var ctx = c.getContext("2d");
-//ctx.translate(0.5, 0.5);
+
+// Get the canvas of the neural net visualisation
+var neuralNetCanvas = document.getElementById('neuralNet');
 
 // When the page is fully loaded
 $(document).ready(function(){
@@ -65,11 +70,11 @@ $(document).ready(function(){
 
     // Main code
     //topology = [4,3,1];
-    topology = [2,4,1];
+    topology = [1,2,1];
     gen = new Generation(topology, numberOfGenomes, new sigmoid(), mutationRate);
 
 	// Update the interface
-	$('#generationIndex').html(gen.generation);
+	$('#generationIndex').html(gen.generation + 1);
 	$('#genomeIndex').html(gen.currentGenome + 1 + "/" + numberOfGenomes);
 	$("#decision").html(0);
     
@@ -83,13 +88,79 @@ $(document).ready(function(){
 
 	}, 1000 / FPS);
 
-    /*var input = [23,43,54,86];
-    neural_net.feedForward(input);
-    console.log(neural_net);*/
-    //console.log(neural_net.layers[2].neurons[0].outputValue);
-    //neural_net.backPropagation();
-    //neural_net.getResults();
+	// Configuration of the chart
+    var data = {
+	    datasets: [
+	        {
+	            label: "Average fitness",
+	            fill: true,
+	            lineTension: 0.2,
+	            backgroundColor: "rgba(75,192,192,0.4)",
+	            borderColor: "rgba(75,192,192,1)",
+	            borderCapStyle: 'butt',
+	            borderDash: [],
+	            borderDashOffset: 0.0,
+	            borderJoinStyle: 'miter',
+	            pointBorderColor: "rgba(75,192,192,1)",
+	            pointBackgroundColor: "#fff",
+	            pointBorderWidth: 1,
+	            pointHoverRadius: 5,
+	            pointHoverBackgroundColor: "rgba(75,192,192,1)",
+	            pointHoverBorderColor: "rgba(220,220,220,1)",
+	            pointHoverBorderWidth: 2,
+	            pointRadius: 5,
+	            pointHitRadius: 10,
+	            spanGaps: false,
+	        }
+	    ]
+	};
+
+
+	//Creation of the empty chart
+    var chartCtx = document.getElementById("Chart");
+	fitnessChart = new Chart(chartCtx, {
+	    type: 'line',
+	    data: data,
+	    options: {
+	        title: {
+	            display: true,
+	            text: 'Average fitness over generations' // Title
+	        },
+			/*scales: {
+				xAxes: [{
+					scaleLabel: {
+						display: true,
+						labelString: 'Generation'
+					}
+				}]
+			}*/
+	    }
+	});
+
+    // Call "resizeNeuralNetCanvas" when the window has been resized
+    window.addEventListener('resize', resizeNeuralNetCanvas, false);
+
+    // Resize the canvas depending the container size
+    resizeNeuralNetCanvas();
 });
+
+//
+function resizeNeuralNetCanvas() {
+    neuralNetCanvas.width = $("#neuralNetPreview").width();
+    neuralNetCanvas.height = $("#neuralNetPreview").height();
+
+    // Redraw the neural net after changing the size
+    gen.drawNeuralNet(c,ctx);
+}
+
+// Add a fitness to a chart
+function addDataToChart(chart,fitness) {
+	var chartLength = chart.data.datasets[0].data.length;
+
+	chart.data.datasets[0].data[chartLength] = fitness;
+	chart.data.labels[chartLength] = "Generation " + (chartLength + 1);
+	chart.update();
+}
 
 // Change the state of the AI
 function changeRunningState() {
@@ -154,17 +225,17 @@ function startIA(pVelocity,pDistance,pYPosition,pSize) {
 
 			//$("#neuralNetPreview").html("");
 
-			// Check if the game as restarted before changing generation
+			// Check if the game has restarted before changing generation
 			if (!runner.crashed) {
 				// Change the generation and save the fitness
-				gen.nextGen(fitness);
+				gen.nextGen(fitness, fitnessChart);
 
 				// Reset the value (counting obstacle)
 				nbOfObstacle = 0;
 				lastValue = 1000
 
 				// Update the interface
-				$('#generationIndex').html(gen.generation);
+				$('#generationIndex').html(gen.generation + 1);
 				$('#genomeIndex').html(gen.currentGenome + 1 + "/" + numberOfGenomes);
 				$("#decision").html(0);
 			}
@@ -263,7 +334,7 @@ function ravel(array) {
 	return result;
 }
 
-// For debug
+// For debug (faster)
 function log(msg) {
 	console.log(msg);
 }

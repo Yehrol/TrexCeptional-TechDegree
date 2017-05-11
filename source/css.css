@@ -34,7 +34,7 @@ html, body {
   line-height: 1.55;
   margin: 0 auto;
   max-width: 600px;
-  padding-top: 100px;
+  /*padding-top: 100px;*/
   width: 100%;
 }
 
@@ -42,10 +42,10 @@ html, body {
   height: 150px;
   max-width: 600px;
   overflow: hidden;
-  position: absolute;
-  top: 35px;
+  /*position: absolute;*/
+  /*top: 35px;*/
   width: 44px;
-  margin-top: 150px;
+  /*margin-top: 150px;*/
 }
 
 .offline .runner-canvas {
@@ -53,8 +53,8 @@ html, body {
   max-width: 600px;
   opacity: 1;
   overflow: hidden;
-  position: absolute;
-  top: 0;
+  /*position: absolute;
+  top: 0;*/
   z-index: 2;
 }
 
@@ -62,7 +62,7 @@ html, body {
   background: rgba(247, 247, 247, .1);
   height: 100vh;
   left: 0;
-  position: absolute;
+  /*position: absolute;*/
   top: 0;
   width: 100vw;
   z-index: 1;
@@ -91,12 +91,12 @@ html, body {
   .icon-offline {
     margin: 0 0 10px;
   }
-  .interstitial-wrapper {
+  /*.interstitial-wrapper {
     margin-top: 5%;
   }
   .nav-wrapper {
     margin-top: 30px;
-  }
+  }*/
 }
 
 @media (min-width: 600px) and (max-width: 736px) and (orientation: landscape) {
@@ -107,9 +107,9 @@ html, body {
 }
 
 @media (min-width: 420px) and (max-width: 736px) and (min-height: 240px) and (max-height: 420px) and (orientation:landscape) {
-  .interstitial-wrapper {
+  /*.interstitial-wrapper {
     margin-bottom: 100px;
-  }
+  }*/
 }
 
 /*@media (min-height: 240px) and (orientation: landscape) {
@@ -125,9 +125,6 @@ html, body {
   .icon-offline {
     margin-bottom: 0;
   }
-  .offline .runner-container {
-    top: 10px;
-  }
 }
 
 @media (max-width: 240px) {
@@ -137,6 +134,11 @@ html, body {
   }
 }
 
+
+/*
+
+*/
+
 .materialize-textarea {
   height: 200px !important;
 }
@@ -144,4 +146,14 @@ html, body {
 textarea {
   max-height: 300px !important;
   overflow-y: scroll !important;
+}
+
+.container {
+  margin: 0 auto !important;
+  max-width: 4000px !important;
+  width: 95% !important;
+}
+
+#main-content{
+  height: 0px !important;
 }
