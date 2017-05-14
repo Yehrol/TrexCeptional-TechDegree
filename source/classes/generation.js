@@ -37,7 +37,7 @@ class Generation {
 	    var normalizedSize = pSize / maxSize;
 
 		// Create the input array for the neural network
-		var input = [normalizedDistance];//normalizedVelocity,,normalizedSize,normalizedYPosition
+		var input = [normalizedDistance];//,normalizedVelocity,normalizedSize,normalizedYPosition
 		//log("velocity : " + normalizedVelocity);
 		//log("distance : " + normalizedDistance);
 		//log("y position : " + normalizedYPosition);
@@ -48,7 +48,7 @@ class Generation {
 
 		// Check which move the AI should do
 		var result = this.genomes[this.currentGenome].getOutput();
-		$("#decision").html(result.toFixed(4));
+		$("#decision").html(result.toFixed(3));
 		if (result > 0.6) { // greater than 0.5 [press up]
 			simulateKeyPress(38, "keydown");
 		} 
@@ -95,8 +95,25 @@ class Generation {
 		return fitnessAverage;
 	}
 
+	getBestFitness() {
+		var bestFitness = 0;
+		for (var i = 0; i < this.genomes.length; i++) {
+			if (bestFitness < this.genomes[i].fitness) {
+				bestFitness = this.genomes[i].fitness;
+			}
+		}
+
+		return bestFitness;
+	}
+
 	//
 	selection() {
+		//this.bestSelection();
+		this.rouletteWheelSelection();
+		//this.bestSelection();
+	}
+
+	bestSelection(){
 		// Store the best genome
 		var selected = [];
 		var tmpWeight = [];
@@ -153,11 +170,39 @@ class Generation {
 		this.crossover(selected);
 	}
 
+	//
+	rouletteWheelSelection() {
+		var selected = [];
+		var numberOfWantedParents = 2*Math.floor(Math.sqrt(this.genomes.length)/2);
+
+		for (var i = 0; i < numberOfWantedParents; i++) { // Number of wanted genomes for breeding
+			var sum = 0;
+			// Get the total fitness
+			for (var genomeIndex = 0; genomeIndex < this.genomes.length; genomeIndex++) {
+				sum += this.genomes[genomeIndex].fitness + 0.1; // +1 because some can have 0 fitness
+			}
+
+			//
+			var treshold = Math.floor(Math.random() * Math.floor(sum));
+
+			for (var genomeIndex = 0; genomeIndex < this.genomes.length; genomeIndex++) {
+				sum += this.genomes[genomeIndex].fitness + 0.1;
+				if (sum > treshold) {
+					log(this.genomes[genomeIndex]);
+					selected.push(this.genomes[genomeIndex]);
+					this.genomes.splice(genomeIndex, 1)
+					break;
+				}
+			}
+		}
+		log("--------------------");
+
+		this.crossover(selected);
+	}
+
 	// 
 	crossover(pSelectedGenomes) {
-		
 		this.singlePointCrossover(pSelectedGenomes);
-		//create new gen
 	}
 
 	//

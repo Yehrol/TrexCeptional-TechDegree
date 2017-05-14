@@ -10,9 +10,9 @@ var isRunning = false;
 var runner;
 
 var gen;
-var numberOfGenomes = 4; //Genomes per generation [minimum 4]
+var numberOfGenomes = 12; //Genomes per generation [minimum 4]
 var mutationRate = 0.2;
-var topology
+var topology = [1,2,1];
 
 var FPS = 60;
 
@@ -68,9 +68,6 @@ $(document).ready(function(){
 	maxYPosition = 105;
 	maxSize = runner.config.MAX_OBSTACLE_LENGTH;
 
-    // Main code
-    //topology = [4,3,1];
-    topology = [1,2,1];
     gen = new Generation(topology, numberOfGenomes, new sigmoid(), mutationRate);
 
 	// Update the interface
@@ -218,7 +215,7 @@ function startIA(pVelocity,pDistance,pYPosition,pSize) {
 
 		// When the AI die
 		if (runner.crashed) {
-			var fitness = nbOfObstacle;//runner.distanceRan.toFixed(0)
+			var fitness = nbOfObstacle;
 
 			// Restart the game
 			restartGame();
