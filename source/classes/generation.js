@@ -5,6 +5,8 @@
 * Date : 24.04.2017
 ***********************************************************/
 
+var lastValue = 1000;
+
 class Generation {
 	constructor(pTopology, pNbOfGenome, pActivationFunction, pRate) {
 		this.genomes = [];
@@ -43,44 +45,70 @@ class Generation {
 		//log("y position : " + normalizedYPosition);
 		//log("size : " + normalizedSize);
 
-		// Feed the neural network with the normalized T-Rex value
-    	this.genomes[this.currentGenome].feedForward(input);
+		for (var genomeIndex = 0; genomeIndex < this.genomes.length; genomeIndex++) {
+			// Feed the neural network with the normalized T-Rex value
+    		this.genomes[genomeIndex].feedForward(input);
 
-		// Check which move the AI should do
-		var result = this.genomes[this.currentGenome].getOutput();
-		$("#decision").html(result.toFixed(3));
-		if (result > 0.6) { // greater than 0.5 [press up]
-			simulateKeyPress(38, "keydown");
-		} 
-		else if (result < 0.4) { // less than 0.4 [press down]
-			simulateKeyPress(40, "keydown");
+    		// Check which move the AI should do
+			var result = this.genomes[genomeIndex].getOutput();
+
+			//BUG HERE !! ? some actions are strange (when trex dies)
+			if (typeof runner.tRex[genomeIndex] != "undefined") {
+				if (pDistance > lastValue) {
+					this.genomes[genomeIndex].fitness++;
+				}
+
+				if (result > 0.6) {
+					runner.tRex[genomeIndex].setDuck(false);
+					runner.tRex[genomeIndex].startJump(runner.currentSpeed);
+					//simulateKeyPress(38, "keydown");
+				} 
+				else if (result < 0.4) {
+					runner.tRex[genomeIndex].setDuck(true);
+					//simulateKeyPress(40, "keydown");
+				}
+				else {
+					runner.tRex[genomeIndex].setDuck(false);
+				}
+			}
 		}
-		else {
-			//do nothing
-		}
+
+		lastValue = pDistance;
+
+		
+
+		
+		//$("#decision").html(result.toFixed(3));
+
+
+		
 	}
 
 	//
-	nextGen(pFitness, pFitnessChart) {
+	nextGen(pFitnessChart) {
 		// Store the score of the current genome
-		this.genomes[this.currentGenome].setFitness(pFitness);
+		//this.genomes[this.currentGenome].setFitness(pFitness); // PROBLEM HERE.
 
 		// Change the generation if we used all the genomes
-		if (this.currentGenome >= this.genomes.length - 1) {
+		//if (this.currentGenome >= this.genomes.length - 1) {
 			// Reset the current genome number
-			this.currentGenome = 0;
+			//this.currentGenome = 0;
 
 			// Change the generation
 			this.generation++;
 
-			addDataToChart(pFitnessChart,this.getFitnessAverage());
+			addDataToChart(pFitnessChart,this.getFitness());
 
 			// Do crossover
 			this.selection();
-		}
-		else {
+		//}
+		/*else {
 			this.currentGenome++;
-		}
+		}*/
+	}
+
+	getFitness() {
+		return this.getBestFitness();
 	}
 
 	//
@@ -176,26 +204,29 @@ class Generation {
 		var numberOfWantedParents = 2*Math.floor(Math.sqrt(this.genomes.length)/2);
 
 		for (var i = 0; i < numberOfWantedParents; i++) { // Number of wanted genomes for breeding
-			var sum = 0;
+			var weightSum = 0;
 			// Get the total fitness
 			for (var genomeIndex = 0; genomeIndex < this.genomes.length; genomeIndex++) {
-				sum += this.genomes[genomeIndex].fitness + 0.1; // +1 because some can have 0 fitness
+				weightSum += (this.genomes[genomeIndex].fitness + 0.1); // +1 because some can have 0 fitness
 			}
 
-			//
-			var treshold = Math.floor(Math.random() * Math.floor(sum));
+			// Get a random value
+			var treshold = Math.random() * weightSum;
+			var sum = 0;
 
+			// Select a genome
 			for (var genomeIndex = 0; genomeIndex < this.genomes.length; genomeIndex++) {
 				sum += this.genomes[genomeIndex].fitness + 0.1;
 				if (sum > treshold) {
-					log(this.genomes[genomeIndex]);
+					//log(this.genomes[genomeIndex]);
 					selected.push(this.genomes[genomeIndex]);
 					this.genomes.splice(genomeIndex, 1)
+					//log(this.genomes);
 					break;
 				}
 			}
 		}
-		log("--------------------");
+		//log("--------------------");
 
 		this.crossover(selected);
 	}
@@ -365,6 +396,7 @@ class Generation {
 	}
 
 	drawNeuralNet(canvas,context) {
-		this.genomes[this.currentGenome].drawNeuralNet(canvas,context);
+		this.genomes[0].drawNeuralNet(canvas,context); // TEMPORARY [NEED TO FIND A SOLUTION]
+		// updown box to select the neural net to show
 	}
 }

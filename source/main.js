@@ -10,7 +10,7 @@ var isRunning = false;
 var runner;
 
 var gen;
-var numberOfGenomes = 12; //Genomes per generation [minimum 4]
+var numberOfGenomes = 4; //Genomes per generation [minimum 4]
 var mutationRate = 0.2;
 var topology = [1,2,1];
 
@@ -81,15 +81,13 @@ $(document).ready(function(){
 		if (typeof runner.horizon.obstacles[0] != "undefined") {
 		    startIA(parseFloat(runner.currentSpeed.toFixed(3)), parseFloat(runner.horizon.obstacles[0].xPos), parseFloat(runner.horizon.obstacles[0].yPos), parseFloat(runner.horizon.obstacles[0].size));
 		}
-
-
 	}, 1000 / FPS);
 
 	// Configuration of the chart
     var data = {
 	    datasets: [
 	        {
-	            label: "Average fitness",
+	            label: "Best fitness",
 	            fill: true,
 	            lineTension: 0.2,
 	            backgroundColor: "rgba(75,192,192,0.4)",
@@ -121,7 +119,7 @@ $(document).ready(function(){
 	    options: {
 	        title: {
 	            display: true,
-	            text: 'Average fitness over generations' // Title
+	            text: 'Best fitness over generations' // Title
 	        },
 			/*scales: {
 				xAxes: [{
@@ -167,13 +165,14 @@ function changeRunningState() {
 	// Show if the AI is started or stopped
 	if (isRunning == true) {
 		// Simulate key press to start the game
+		runner.play();
 		simulateKeyPress(38, "keydown");
 
 		$("#stateBtn").html('STOP<i class="material-icons right">power_settings_new</i>');
 		Materialize.toast('AI Started', 4000);
 	}
 	else{
-		runner.stop()// doesnt work [WIP]
+		runner.stop();
 
 		$("#stateBtn").html('START<i class="material-icons right">power_settings_new</i>');
 		Materialize.toast('AI Stopped', 4000);
@@ -208,14 +207,14 @@ function startIA(pVelocity,pDistance,pYPosition,pSize) {
 		gen.run(pVelocity, pDistance, pYPosition, pSize);
 
 		// Get the number of obstacle passed
-		if (pDistance > lastValue) {
+		/*if (pDistance > lastValue) {
 			nbOfObstacle++;
 		}
-		lastValue = pDistance;
+		lastValue = pDistance;*/
 
 		// When the AI die
 		if (runner.crashed) {
-			var fitness = nbOfObstacle;
+			//var fitness = nbOfObstacle;
 
 			// Restart the game
 			restartGame();
@@ -225,10 +224,10 @@ function startIA(pVelocity,pDistance,pYPosition,pSize) {
 			// Check if the game has restarted before changing generation
 			if (!runner.crashed) {
 				// Change the generation and save the fitness
-				gen.nextGen(fitness, fitnessChart);
+				gen.nextGen(fitnessChart);
 
 				// Reset the value (counting obstacle)
-				nbOfObstacle = 0;
+				/*nbOfObstacle = 0;*/
 				lastValue = 1000
 
 				// Update the interface
