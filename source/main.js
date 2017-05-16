@@ -10,9 +10,9 @@ var isRunning = false;
 var runner;
 
 var gen;
-var numberOfGenomes = 4; //Genomes per generation [minimum 4]
+var numberOfGenomes = 12; //Genomes per generation [minimum 4]
 var mutationRate = 0.2;
-var topology
+var topology = [1,2,1];
 
 var FPS = 60;
 
@@ -56,30 +56,6 @@ $(document).ready(function(){
         }
     });
 
-    // Create the right number of select options
-    var selectOption = "";
-	selectOption += '<select name="neuralNetSelected">';
-    selectOption += '<option value="" disabled>Choose your option</option>'
-	for (var i = 0; i < numberOfGenomes; i++) {
-		if (i == 0) {
-			selectOption += '<option value="'+i+'" selected>Neural net '+(i+1)+'</option>';
-		}
-		else {
-			selectOption += '<option value="'+i+'">Neural net '+(i+1)+'</option>';
-		}
-	}
-    selectOption += '</select>';
-    selectOption += '<label>Neural net to show</label>';
-	$("#selectOption").html(selectOption);
-
-    // Activate the select from materialize
-    $('select').material_select();
-    
-
-	$( "select[name=neuralNetSelected]" ).change(function() {
-		gen.drawNeuralNet(c, ctx, $('select[name=neuralNetSelected]').val());
-	});
-
     // Event when a file is loaded
     document.getElementById('selectedFile').addEventListener('change', readSingleFile, false);
 
@@ -92,9 +68,6 @@ $(document).ready(function(){
 	maxYPosition = 105;
 	maxSize = runner.config.MAX_OBSTACLE_LENGTH;
 
-    // Main code
-    //topology = [4,3,1];
-    topology = [1,2,1];
     gen = new Generation(topology, numberOfGenomes, new sigmoid(), mutationRate);
 
 	// Update the interface
@@ -108,13 +81,15 @@ $(document).ready(function(){
 		if (typeof runner.horizon.obstacles[0] != "undefined") {
 		    startIA(parseFloat(runner.currentSpeed.toFixed(3)), parseFloat(runner.horizon.obstacles[0].xPos), parseFloat(runner.horizon.obstacles[0].yPos), parseFloat(runner.horizon.obstacles[0].size));
 		}
+
+
 	}, 1000 / FPS);
 
 	// Configuration of the chart
     var data = {
 	    datasets: [
 	        {
-	            label: "Best fitness",
+	            label: "Average fitness",
 	            fill: true,
 	            lineTension: 0.2,
 	            backgroundColor: "rgba(75,192,192,0.4)",
@@ -146,7 +121,7 @@ $(document).ready(function(){
 	    options: {
 	        title: {
 	            display: true,
-	            text: 'Best fitness over generations' // Title
+	            text: 'Average fitness over generations' // Title
 	        },
 			/*scales: {
 				xAxes: [{
@@ -172,7 +147,7 @@ function resizeNeuralNetCanvas() {
     neuralNetCanvas.height = $("#neuralNetPreview").height();
 
     // Redraw the neural net after changing the size
-    gen.drawNeuralNet(c,ctx,0);
+    gen.drawNeuralNet(c,ctx);
 }
 
 // Add a fitness to a chart
@@ -220,7 +195,7 @@ function startIA(pVelocity,pDistance,pYPosition,pSize) {
 	// Check if the AI should "work"
 	if (isRunning == true) {
 
-		gen.drawNeuralNet(c,ctx,0);
+		gen.drawNeuralNet(c,ctx);
 
 		// timer
 		test++;
@@ -234,18 +209,14 @@ function startIA(pVelocity,pDistance,pYPosition,pSize) {
 		gen.run(pVelocity, pDistance, pYPosition, pSize);
 
 		// Get the number of obstacle passed
-		/*if (pDistance > lastValue) {
+		if (pDistance > lastValue) {
 			nbOfObstacle++;
 		}
-		lastValue = pDistance;*/
+		lastValue = pDistance;
 
 		// When the AI die
 		if (runner.crashed) {
-<<<<<<< HEAD
-			//var fitness = nbOfObstacle;
-=======
-			var fitness = nbOfObstacle;//runner.distanceRan.toFixed(0)
->>>>>>> parent of dbacad2... Roulette wheel selection
+			var fitness = nbOfObstacle;
 
 			// Restart the game
 			restartGame();
@@ -255,10 +226,10 @@ function startIA(pVelocity,pDistance,pYPosition,pSize) {
 			// Check if the game has restarted before changing generation
 			if (!runner.crashed) {
 				// Change the generation and save the fitness
-				gen.nextGen(fitnessChart);
+				gen.nextGen(fitness, fitnessChart);
 
 				// Reset the value (counting obstacle)
-				/*nbOfObstacle = 0;*/
+				nbOfObstacle = 0;
 				lastValue = 1000
 
 				// Update the interface

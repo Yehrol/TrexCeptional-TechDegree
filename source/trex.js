@@ -2,9 +2,6 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 // extract from chromium source code by @liuwayong
-
-var numberOfTrex = numberOfGenomes;
-
 (function () {
     'use strict';
     /**
@@ -272,14 +269,10 @@ var numberOfTrex = numberOfGenomes;
                     case 'GRAVITY':
                     case 'MIN_JUMP_HEIGHT':
                     case 'SPEED_DROP_COEFFICIENT':
-                        for (var i = 0; i < this.tRex.length; i++) {
-                            this.tRex[i].config[setting] = value;
-                        }
+                        this.tRex.config[setting] = value;
                         break;
                     case 'INITIAL_JUMP_VELOCITY':
-                        for (var i = 0; i < this.tRex.length; i++) {
-                            this.tRex[i].setJumpVelocity(value);
-                        }
+                        this.tRex.setJumpVelocity(value);
                         break;
                     case 'SPEED':
                         this.setSpeed(value);
@@ -383,12 +376,7 @@ var numberOfTrex = numberOfGenomes;
                 this.spriteDef.TEXT_SPRITE, this.dimensions.WIDTH);
 
             // Draw t-rex
-            this.tRex = [];
-
-            for (var i = 0; i < numberOfTrex; i++) {
-                this.tRex.push(new Trex(this.canvas, this.spriteDef.TREX));
-                //this.tRex[i].xPos += i * 15;
-            }
+            this.tRex = new Trex(this.canvas, this.spriteDef.TREX);
 
             this.outerContainerEl.appendChild(this.containerEl);
 
@@ -445,9 +433,7 @@ var numberOfTrex = numberOfGenomes;
                 this.distanceMeter.calcXPos(this.dimensions.WIDTH);
                 this.clearCanvas();
                 this.horizon.update(0, 0, true);
-                for (var i = 0; i < this.tRex.length; i++) {
-                    this.tRex[i].update(0);
-                }
+                this.tRex.update(0);
 
                 // Outer container and distance meter.
                 if (this.playing || this.crashed || this.paused) {
@@ -456,9 +442,7 @@ var numberOfTrex = numberOfGenomes;
                     this.distanceMeter.update(0, Math.ceil(this.distanceRan));
                     this.stop();
                 } else {
-                    for (var i = 0; i < this.tRex.length; i++) {
-                        this.tRex[i].draw(0, 0);
-                    }
+                    this.tRex.draw(0, 0);
                 }
 
                 // Game over panel.
@@ -476,9 +460,7 @@ var numberOfTrex = numberOfGenomes;
         playIntro: function () {
             if (!this.activated && !this.crashed) {
                 this.playingIntro = true;
-                for (var i = 0; i < this.tRex.length; i++) {
-                    this.tRex[i].playingIntro = true;
-                }
+                this.tRex.playingIntro = true;
 
                 // CSS animation definition.
                 var keyframes = '@-webkit-keyframes intro { ' +
@@ -510,9 +492,7 @@ var numberOfTrex = numberOfGenomes;
         startGame: function () {
             this.runningTime = 0;
             this.playingIntro = false;
-            for (var i = 0; i < this.tRex.length; i++) {
-                this.tRex[i].playingIntro = false;
-            }
+            this.tRex.playingIntro = false;
             this.containerEl.style.webkitAnimation = '';
             this.playCount++;
 
@@ -545,20 +525,16 @@ var numberOfTrex = numberOfGenomes;
             if (this.playing) {
                 this.clearCanvas();
 
-                for (var i = 0; i < this.tRex.length; i++) {
-                    if (this.tRex[i].jumping) {
-                        this.tRex[i].updateJump(deltaTime);
-                    }
+                if (this.tRex.jumping) {
+                    this.tRex.updateJump(deltaTime);
                 }
 
                 this.runningTime += deltaTime;
                 var hasObstacles = this.runningTime > this.config.CLEAR_TIME;
 
                 // First jump triggers the intro.
-                for (var i = 0; i < this.tRex.length; i++) {
-                    if (this.tRex[i].jumpCount == 1 && !this.playingIntro) {
-                        this.playIntro();
-                    }
+                if (this.tRex.jumpCount == 1 && !this.playingIntro) {
+                    this.playIntro();
                 }
 
                 // The horizon doesn't move until the intro is over.
@@ -570,23 +546,18 @@ var numberOfTrex = numberOfGenomes;
                         this.inverted);
                 }
 
-                this.distanceRan += this.currentSpeed * deltaTime / this.msPerFrame;
+                // Check for collisions.
+                var collision = hasObstacles &&
+                    checkForCollision(this.horizon.obstacles[0], this.tRex);
 
-                // Check for collisions. NEED WORK log()
-                for (var i = 0; i < this.tRex.length; i++) {
-                    if (!(hasObstacles && checkForCollision(this.horizon.obstacles[0], this.tRex[i]))) {
+                if (!collision) {
+                    this.distanceRan += this.currentSpeed * deltaTime / this.msPerFrame;
 
-                        if (this.currentSpeed < this.config.MAX_SPEED) {
-                            this.currentSpeed += this.config.ACCELERATION;
-                        }
-                    } else {
-                        if (this.tRex.length <= 1) {
-                            this.gameOver();
-                        }
-                        else {
-                            this.tRex.splice(i,1);
-                        }
+                    if (this.currentSpeed < this.config.MAX_SPEED) {
+                        this.currentSpeed += this.config.ACCELERATION;
                     }
+                } else {
+                    this.gameOver();
                 }
 
                 var playAchievementSound = this.distanceMeter.update(deltaTime,
@@ -604,7 +575,8 @@ var numberOfTrex = numberOfGenomes;
                 } else if (this.invertTimer) {
                     this.invertTimer += deltaTime;
                 } else {
-                    var actualDistance = this.distanceMeter.getActualDistance(Math.ceil(this.distanceRan));
+                    var actualDistance =
+                        this.distanceMeter.getActualDistance(Math.ceil(this.distanceRan));
 
                     if (actualDistance > 0) {
                         this.invertTrigger = !(actualDistance %
@@ -618,12 +590,10 @@ var numberOfTrex = numberOfGenomes;
                 }
             }
 
-            //NEED WORK log()
-            for (var i = 0; i < this.tRex.length; i++) {
-                if (this.playing || (!this.activated && this.tRex[i].blinkCount < Runner.config.MAX_BLINK_COUNT)) {//
-                    this.tRex[i].update(deltaTime);
-                    this.scheduleNextUpdate();
-                }
+            if (this.playing || (!this.activated &&
+                this.tRex.blinkCount < Runner.config.MAX_BLINK_COUNT)) {
+                this.tRex.update(deltaTime);
+                this.scheduleNextUpdate();
             }
         },
 
@@ -706,11 +676,9 @@ var numberOfTrex = numberOfGenomes;
                         }
                     }
                     //  Play sound effect and jump on starting the game for the first time.
-                    for (var i = 0; i < this.tRex.length; i++) {
-                        if (!this.tRex[i].jumping && !this.tRex[i].ducking) {
-                            this.playSound(this.soundFx.BUTTON_PRESS);
-                            this.tRex[i].startJump(this.currentSpeed);
-                        }
+                    if (!this.tRex.jumping && !this.tRex.ducking) {
+                        this.playSound(this.soundFx.BUTTON_PRESS);
+                        this.tRex.startJump(this.currentSpeed);
                     }
                 }
 
@@ -722,14 +690,12 @@ var numberOfTrex = numberOfGenomes;
 
             if (this.playing && !this.crashed && Runner.keycodes.DUCK[e.keyCode]) {
                 e.preventDefault();
-                for (var i = 0; i < this.tRex.length; i++) {
-                    if (this.tRex[i].jumping) {
-                        // Speed drop, activated only when jump key is not pressed.
-                        this.tRex[i].setSpeedDrop();
-                    } else if (!this.tRex[i].jumping && !this.tRex[i].ducking) {
-                        // Duck.
-                        this.tRex[i].setDuck(true);
-                    }
+                if (this.tRex.jumping) {
+                    // Speed drop, activated only when jump key is not pressed.
+                    this.tRex.setSpeedDrop();
+                } else if (!this.tRex.jumping && !this.tRex.ducking) {
+                    // Duck.
+                    this.tRex.setDuck(true);
                 }
             }
         },
@@ -746,14 +712,10 @@ var numberOfTrex = numberOfGenomes;
                 e.type == Runner.events.MOUSEDOWN;
 
             if (this.isRunning() && isjumpKey) {
-                for (var i = 0; i < this.tRex.length; i++) {
-                    this.tRex[i].endJump();
-                }
+                this.tRex.endJump();
             } else if (Runner.keycodes.DUCK[keyCode]) {
-                for (var i = 0; i < this.tRex.length; i++) {
-                    this.tRex[i].speedDrop = false;
-                    this.tRex[i].setDuck(false);
-                }
+                this.tRex.speedDrop = false;
+                this.tRex.setDuck(false);
             } else if (this.crashed) {
                 // Check that enough time has elapsed before allowing jump key to restart.
                 var deltaTime = getTimeStamp() - this.time;
@@ -765,7 +727,7 @@ var numberOfTrex = numberOfGenomes;
                 }
             } else if (this.paused && isjumpKey) {
                 // Reset the jump state
-                this.tRex[0].reset();
+                this.tRex.reset();
                 this.play();
             }
         },
@@ -810,9 +772,7 @@ var numberOfTrex = numberOfGenomes;
             this.crashed = true;
             this.distanceMeter.acheivement = false;
 
-            for (var i = 0; i < this.tRex.length; i++) {
-                this.tRex[i].update(100, Trex.status.CRASHED);
-            }
+            this.tRex.update(100, Trex.status.CRASHED);
 
             // Game over panel.
             if (!this.gameOverPanel) {
@@ -844,9 +804,7 @@ var numberOfTrex = numberOfGenomes;
             if (!this.crashed) {
                 this.playing = true;
                 this.paused = false;
-                for (var i = 0; i < this.tRex.length; i++) {
-                    this.tRex[i].update(0, Trex.status.RUNNING);
-                }
+                this.tRex.update(0, Trex.status.RUNNING);
                 this.time = getTimeStamp();
                 this.update();
             }
@@ -865,15 +823,7 @@ var numberOfTrex = numberOfGenomes;
                 this.clearCanvas();
                 this.distanceMeter.reset(this.highestScore);
                 this.horizon.reset();
-
-                this.tRex = []
-                for (var i = 0; i < numberOfTrex; i++) {
-                    this.tRex.push(new Trex(this.canvas, this.spriteDef.TREX))
-                    this.tRex[i].reset();
-                    this.tRex[i].xPos = 23
-                    //this.tRex[i].xPos += i * 15;
-                }
-
+                this.tRex.reset();
                 this.playSound(this.soundFx.BUTTON_PRESS);
                 this.invert(true);
                 this.update();
@@ -888,9 +838,7 @@ var numberOfTrex = numberOfGenomes;
                 document.visibilityState != 'visible') {
                 this.stop();
             } else if (!this.crashed) {
-                for (var i = 0; i < this.tRex.length; i++) {
-                    this.tRex[i].reset();
-                }
+                this.tRex.reset();
                 this.play();
             }
         },*/
@@ -1148,7 +1096,6 @@ var numberOfTrex = numberOfGenomes;
      *    collision boxes.
      * @return {Array<CollisionBox>}
      */
-
     function checkForCollision(obstacle, tRex, opt_canvasCtx) {
         var obstacleBoxXPos = Runner.defaultDimensions.WIDTH + obstacle.xPos;
 
@@ -1694,7 +1641,7 @@ var numberOfTrex = numberOfGenomes;
 
                 if (opt_status == Trex.status.WAITING) {
                     this.animStartTime = getTimeStamp();
-                    //this.setBlinkDelay();
+                    this.setBlinkDelay();
                 }
             }
 
@@ -1705,7 +1652,7 @@ var numberOfTrex = numberOfGenomes;
             }
 
             if (this.status == Trex.status.WAITING) {
-                //this.blink(getTimeStamp());
+                this.blink(getTimeStamp());
             } else {
                 this.draw(this.currentAnimFrames[this.currentFrame], 0);
             }

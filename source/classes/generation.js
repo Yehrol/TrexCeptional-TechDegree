@@ -5,8 +5,6 @@
 * Date : 24.04.2017
 ***********************************************************/
 
-var lastValue = 1000;
-
 class Generation {
 	constructor(pTopology, pNbOfGenome, pActivationFunction, pRate) {
 		this.genomes = [];
@@ -19,7 +17,7 @@ class Generation {
 		this.generation = 0;
 		this.currentGenome = 0;
 		this.rate = pRate;
-		//(Math.random() - 0.5) * 3 + (Math.random() - 0.5)
+		//this.weightVariation = Math.random() - 0.5; //[-0.5...0.5] ---- (Math.random() - 0.5) * 3 + (Math.random() - 0.5)
 
 		// Forced to store them to create a new object from the object himself
 		this.topology = pTopology;
@@ -39,51 +37,18 @@ class Generation {
 	    var normalizedSize = pSize / maxSize;
 
 		// Create the input array for the neural network
-		var input = [normalizedDistance];//normalizedVelocity,,normalizedSize,normalizedYPosition
+		var input = [normalizedDistance];//,normalizedVelocity,normalizedSize,normalizedYPosition
 		//log("velocity : " + normalizedVelocity);
 		//log("distance : " + normalizedDistance);
 		//log("y position : " + normalizedYPosition);
 		//log("size : " + normalizedSize);
 
-<<<<<<< HEAD
-		for (var genomeIndex = 0; genomeIndex < this.genomes.length; genomeIndex++) {
-			// Feed the neural network with the normalized T-Rex value
-    		this.genomes[genomeIndex].feedForward(input);
-
-    		// Check which move the AI should do
-			var result = this.genomes[genomeIndex].getOutput();
-
-			//BUG HERE !! ? some actions are strange (when trex dies)
-			if (typeof runner.tRex[genomeIndex] != "undefined") {
-				if (pDistance > lastValue) {
-					this.genomes[genomeIndex].fitness++;
-				}
-
-				if (result > 0.6) {
-					runner.tRex[genomeIndex].setDuck(false);
-					runner.tRex[genomeIndex].speedDrop = false;
-					runner.tRex[genomeIndex].startJump(runner.currentSpeed);
-					//simulateKeyPress(38, "keydown");
-				} 
-				else if (result < 0.4) {
-					runner.tRex[genomeIndex].setDuck(true);
-					runner.tRex[genomeIndex].setSpeedDrop();
-					runner.tRex[genomeIndex].endJump();
-					//simulateKeyPress(40, "keydown");
-				}
-				else {
-					runner.tRex[genomeIndex].speedDrop = false;
-					runner.tRex[genomeIndex].setDuck(false);
-					runner.tRex[genomeIndex].endJump();
-				}
-			}
-=======
 		// Feed the neural network with the normalized T-Rex value
     	this.genomes[this.currentGenome].feedForward(input);
 
 		// Check which move the AI should do
 		var result = this.genomes[this.currentGenome].getOutput();
-		$("#decision").html(result.toFixed(4));
+		$("#decision").html(result.toFixed(3));
 		if (result > 0.6) { // greater than 0.5 [press up]
 			simulateKeyPress(38, "keydown");
 		} 
@@ -92,45 +57,30 @@ class Generation {
 		}
 		else {
 			//do nothing
->>>>>>> parent of dbacad2... Roulette wheel selection
 		}
-
-		lastValue = pDistance;
-
-		
-
-		
-		//$("#decision").html(result.toFixed(3));
-
-
-		
 	}
 
 	//
-	nextGen(pFitnessChart) {
+	nextGen(pFitness, pFitnessChart) {
 		// Store the score of the current genome
-		//this.genomes[this.currentGenome].setFitness(pFitness); // PROBLEM HERE.
+		this.genomes[this.currentGenome].setFitness(pFitness);
 
 		// Change the generation if we used all the genomes
-		//if (this.currentGenome >= this.genomes.length - 1) {
+		if (this.currentGenome >= this.genomes.length - 1) {
 			// Reset the current genome number
-			//this.currentGenome = 0;
+			this.currentGenome = 0;
 
 			// Change the generation
 			this.generation++;
 
-			addDataToChart(pFitnessChart,this.getFitness());
+			addDataToChart(pFitnessChart,this.getFitnessAverage());
 
 			// Do crossover
 			this.selection();
-		//}
-		/*else {
+		}
+		else {
 			this.currentGenome++;
-		}*/
-	}
-
-	getFitness() {
-		return this.getBestFitness();
+		}
 	}
 
 	//
@@ -145,8 +95,25 @@ class Generation {
 		return fitnessAverage;
 	}
 
+	getBestFitness() {
+		var bestFitness = 0;
+		for (var i = 0; i < this.genomes.length; i++) {
+			if (bestFitness < this.genomes[i].fitness) {
+				bestFitness = this.genomes[i].fitness;
+			}
+		}
+
+		return bestFitness;
+	}
+
 	//
 	selection() {
+		//this.bestSelection();
+		this.rouletteWheelSelection();
+		//this.bestSelection();
+	}
+
+	bestSelection(){
 		// Store the best genome
 		var selected = [];
 		var tmpWeight = [];
@@ -203,47 +170,39 @@ class Generation {
 		this.crossover(selected);
 	}
 
-<<<<<<< HEAD
 	//
 	rouletteWheelSelection() {
 		var selected = [];
 		var numberOfWantedParents = 2*Math.floor(Math.sqrt(this.genomes.length)/2);
 
 		for (var i = 0; i < numberOfWantedParents; i++) { // Number of wanted genomes for breeding
-			var weightSum = 0;
+			var sum = 0;
 			// Get the total fitness
 			for (var genomeIndex = 0; genomeIndex < this.genomes.length; genomeIndex++) {
-				weightSum += (this.genomes[genomeIndex].fitness + 0.1); // +1 because some can have 0 fitness
+				sum += this.genomes[genomeIndex].fitness + 0.1; // +1 because some can have 0 fitness
 			}
 
-			// Get a random value
-			var treshold = Math.random() * weightSum;
-			var sum = 0;
+			//
+			var treshold = Math.floor(Math.random() * Math.floor(sum));
 
-			// Select a genome
 			for (var genomeIndex = 0; genomeIndex < this.genomes.length; genomeIndex++) {
 				sum += this.genomes[genomeIndex].fitness + 0.1;
 				if (sum > treshold) {
-					//log(this.genomes[genomeIndex]);
+					log(this.genomes[genomeIndex]);
 					selected.push(this.genomes[genomeIndex]);
 					this.genomes.splice(genomeIndex, 1)
-					//log(this.genomes);
 					break;
 				}
 			}
 		}
-		//log("--------------------");
+		log("--------------------");
 
 		this.crossover(selected);
 	}
 
-=======
->>>>>>> parent of dbacad2... Roulette wheel selection
 	// 
 	crossover(pSelectedGenomes) {
-		
 		this.singlePointCrossover(pSelectedGenomes);
-		//create new gen
 	}
 
 	//
@@ -405,7 +364,7 @@ class Generation {
 		this.genomes = nextGenomes;
 	}
 
-	drawNeuralNet(canvas, context, genomeIndex) {
-		this.genomes[genomeIndex].drawNeuralNet(canvas,context);
+	drawNeuralNet(canvas,context) {
+		this.genomes[this.currentGenome].drawNeuralNet(canvas,context);
 	}
 }
