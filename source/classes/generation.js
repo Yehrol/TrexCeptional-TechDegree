@@ -177,13 +177,15 @@ class Generation {
 
 		for (var i = 0; i < numberOfWantedParents; i++) { // Number of wanted genomes for breeding
 			var sum = 0;
+			var weightSum = 0;
+			
 			// Get the total fitness
 			for (var genomeIndex = 0; genomeIndex < this.genomes.length; genomeIndex++) {
-				sum += this.genomes[genomeIndex].fitness + 0.1; // +1 because some can have 0 fitness
+				weightSum += this.genomes[genomeIndex].fitness + 0.1; // +1 because some can have 0 fitness
 			}
 
 			//
-			var treshold = Math.floor(Math.random() * Math.floor(sum));
+			var treshold = Math.random() * weightSum;
 
 			for (var genomeIndex = 0; genomeIndex < this.genomes.length; genomeIndex++) {
 				sum += this.genomes[genomeIndex].fitness + 0.1;
