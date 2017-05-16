@@ -570,10 +570,11 @@ var numberOfTrex = numberOfGenomes;
                         this.inverted);
                 }
 
+                this.distanceRan += this.currentSpeed * deltaTime / this.msPerFrame;
+
                 // Check for collisions. NEED WORK log()
                 for (var i = 0; i < this.tRex.length; i++) {
                     if (!(hasObstacles && checkForCollision(this.horizon.obstacles[0], this.tRex[i]))) {
-                        this.distanceRan += this.currentSpeed * deltaTime / this.msPerFrame;
 
                         if (this.currentSpeed < this.config.MAX_SPEED) {
                             this.currentSpeed += this.config.ACCELERATION;

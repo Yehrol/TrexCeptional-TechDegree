@@ -56,6 +56,30 @@ $(document).ready(function(){
         }
     });
 
+    // Create the right number of select options
+    var selectOption = "";
+	selectOption += '<select name="neuralNetSelected">';
+    selectOption += '<option value="" disabled>Choose your option</option>'
+	for (var i = 0; i < numberOfGenomes; i++) {
+		if (i == 0) {
+			selectOption += '<option value="'+i+'" selected>Neural net '+(i+1)+'</option>';
+		}
+		else {
+			selectOption += '<option value="'+i+'">Neural net '+(i+1)+'</option>';
+		}
+	}
+    selectOption += '</select>';
+    selectOption += '<label>Neural net to show</label>';
+	$("#selectOption").html(selectOption);
+
+    // Activate the select from materialize
+    $('select').material_select();
+    
+
+	$( "select[name=neuralNetSelected]" ).change(function() {
+		gen.drawNeuralNet(c, ctx, $('select[name=neuralNetSelected]').val());
+	});
+
     // Event when a file is loaded
     document.getElementById('selectedFile').addEventListener('change', readSingleFile, false);
 
@@ -145,7 +169,7 @@ function resizeNeuralNetCanvas() {
     neuralNetCanvas.height = $("#neuralNetPreview").height();
 
     // Redraw the neural net after changing the size
-    gen.drawNeuralNet(c,ctx);
+    gen.drawNeuralNet(c,ctx,0);
 }
 
 // Add a fitness to a chart
@@ -193,7 +217,7 @@ function startIA(pVelocity,pDistance,pYPosition,pSize) {
 	// Check if the AI should "work"
 	if (isRunning == true) {
 
-		gen.drawNeuralNet(c,ctx);
+		gen.drawNeuralNet(c,ctx,0);
 
 		// timer
 		test++;

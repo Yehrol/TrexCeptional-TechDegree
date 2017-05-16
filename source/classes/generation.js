@@ -19,7 +19,7 @@ class Generation {
 		this.generation = 0;
 		this.currentGenome = 0;
 		this.rate = pRate;
-		//this.weightVariation = Math.random() - 0.5; //[-0.5...0.5] ---- (Math.random() - 0.5) * 3 + (Math.random() - 0.5)
+		//(Math.random() - 0.5) * 3 + (Math.random() - 0.5)
 
 		// Forced to store them to create a new object from the object himself
 		this.topology = pTopology;
@@ -60,15 +60,20 @@ class Generation {
 
 				if (result > 0.6) {
 					runner.tRex[genomeIndex].setDuck(false);
+					runner.tRex[genomeIndex].speedDrop = false;
 					runner.tRex[genomeIndex].startJump(runner.currentSpeed);
 					//simulateKeyPress(38, "keydown");
 				} 
 				else if (result < 0.4) {
 					runner.tRex[genomeIndex].setDuck(true);
+					runner.tRex[genomeIndex].setSpeedDrop();
+					runner.tRex[genomeIndex].endJump();
 					//simulateKeyPress(40, "keydown");
 				}
 				else {
+					runner.tRex[genomeIndex].speedDrop = false;
 					runner.tRex[genomeIndex].setDuck(false);
+					runner.tRex[genomeIndex].endJump();
 				}
 			}
 		}
@@ -395,8 +400,7 @@ class Generation {
 		this.genomes = nextGenomes;
 	}
 
-	drawNeuralNet(canvas,context) {
-		this.genomes[0].drawNeuralNet(canvas,context); // TEMPORARY [NEED TO FIND A SOLUTION]
-		// updown box to select the neural net to show
+	drawNeuralNet(canvas, context, genomeIndex) {
+		this.genomes[genomeIndex].drawNeuralNet(canvas,context);
 	}
 }
