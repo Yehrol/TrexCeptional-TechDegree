@@ -39,12 +39,13 @@ class Generation {
 	    var normalizedSize = pSize / maxSize;
 
 		// Create the input array for the neural network
-		var input = [normalizedDistance];//,normalizedVelocity,normalizedSize,normalizedYPosition
+		var input = [normalizedDistance];//normalizedVelocity,,normalizedSize,normalizedYPosition
 		//log("velocity : " + normalizedVelocity);
 		//log("distance : " + normalizedDistance);
 		//log("y position : " + normalizedYPosition);
 		//log("size : " + normalizedSize);
 
+<<<<<<< HEAD
 		for (var genomeIndex = 0; genomeIndex < this.genomes.length; genomeIndex++) {
 			// Feed the neural network with the normalized T-Rex value
     		this.genomes[genomeIndex].feedForward(input);
@@ -76,6 +77,22 @@ class Generation {
 					runner.tRex[genomeIndex].endJump();
 				}
 			}
+=======
+		// Feed the neural network with the normalized T-Rex value
+    	this.genomes[this.currentGenome].feedForward(input);
+
+		// Check which move the AI should do
+		var result = this.genomes[this.currentGenome].getOutput();
+		$("#decision").html(result.toFixed(4));
+		if (result > 0.6) { // greater than 0.5 [press up]
+			simulateKeyPress(38, "keydown");
+		} 
+		else if (result < 0.4) { // less than 0.4 [press down]
+			simulateKeyPress(40, "keydown");
+		}
+		else {
+			//do nothing
+>>>>>>> parent of dbacad2... Roulette wheel selection
 		}
 
 		lastValue = pDistance;
@@ -128,25 +145,8 @@ class Generation {
 		return fitnessAverage;
 	}
 
-	getBestFitness() {
-		var bestFitness = 0;
-		for (var i = 0; i < this.genomes.length; i++) {
-			if (bestFitness < this.genomes[i].fitness) {
-				bestFitness = this.genomes[i].fitness;
-			}
-		}
-
-		return bestFitness;
-	}
-
 	//
 	selection() {
-		//this.bestSelection();
-		this.rouletteWheelSelection();
-		//this.bestSelection();
-	}
-
-	bestSelection(){
 		// Store the best genome
 		var selected = [];
 		var tmpWeight = [];
@@ -203,6 +203,7 @@ class Generation {
 		this.crossover(selected);
 	}
 
+<<<<<<< HEAD
 	//
 	rouletteWheelSelection() {
 		var selected = [];
@@ -236,9 +237,13 @@ class Generation {
 		this.crossover(selected);
 	}
 
+=======
+>>>>>>> parent of dbacad2... Roulette wheel selection
 	// 
 	crossover(pSelectedGenomes) {
+		
 		this.singlePointCrossover(pSelectedGenomes);
+		//create new gen
 	}
 
 	//

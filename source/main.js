@@ -12,7 +12,7 @@ var runner;
 var gen;
 var numberOfGenomes = 4; //Genomes per generation [minimum 4]
 var mutationRate = 0.2;
-var topology = [1,2,1];
+var topology
 
 var FPS = 60;
 
@@ -92,6 +92,9 @@ $(document).ready(function(){
 	maxYPosition = 105;
 	maxSize = runner.config.MAX_OBSTACLE_LENGTH;
 
+    // Main code
+    //topology = [4,3,1];
+    topology = [1,2,1];
     gen = new Generation(topology, numberOfGenomes, new sigmoid(), mutationRate);
 
 	// Update the interface
@@ -238,7 +241,11 @@ function startIA(pVelocity,pDistance,pYPosition,pSize) {
 
 		// When the AI die
 		if (runner.crashed) {
+<<<<<<< HEAD
 			//var fitness = nbOfObstacle;
+=======
+			var fitness = nbOfObstacle;//runner.distanceRan.toFixed(0)
+>>>>>>> parent of dbacad2... Roulette wheel selection
 
 			// Restart the game
 			restartGame();

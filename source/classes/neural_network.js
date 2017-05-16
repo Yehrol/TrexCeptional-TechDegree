@@ -132,7 +132,7 @@ class NeuralNetwork {
 		// The size in pixel for a neuron
 		var neuronSize = 0;
 		var neuronSpace = 10;
-		var spaceFromBorder = 20;
+		var spaceFromBorder = 50;
 		var pourcent = 15;
 
 		// Get the biggest number of neuron per layer
