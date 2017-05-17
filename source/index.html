@@ -37,11 +37,17 @@
                                     <li>Generation : <span id="generationIndex">X</span></li>
                                     <li>Genome : <span id="genomeIndex">X</span></li>
                                     <li>Time passed [s] : <span id="timeIndex">0</span></li>
-                                    <li>T-Rex decision : <span id="decision">X</span></li>
                                 </ul>
                             </div>
                         </div>
                         <div class="card-panel grey lighten-2">
+                            <h5>Game selector</h5>
+                            <select name="gameSelector">
+                                <option value="1" selected>T-Rex</option>
+                                <option value="2">Flappy bird</option>
+                            </select>
+                        </div>
+                        <div class="card-panel grey lighten-2" id="gameValues">
                             <h5>T-Rex values</h5>
                             <div class="card-content">
                                 <ul>
@@ -52,15 +58,6 @@
                                 </ul>
                             </div>
                         </div>
-                        <!--<div class="card-panel grey lighten-2">
-                            <h5>Controls</h5>
-                            <div class="card-content">
-                                <div class="card-content">
-                                    <img src="assets/added/up.png" alt="input" class="responsive-img">
-                                    <img src="assets/added/down.png" alt="input" class="responsive-img">
-                                </div>
-                            </div>
-                        </div>-->
                         <button class="btn waves-effect waves-light" type="button" id="stateBtn" onclick="changeRunningState();">START
                             <i class="material-icons right">power_settings_new</i>
                         </button>
@@ -198,6 +195,13 @@
             </div>
         </div>
 
+        <div style="display:none;">
+            <img id="flapBackground" src="./assets/flappy/background.png">
+            <img id="flapBird" src="./assets/flappy/bird.png">
+            <img id="flapPipeBottom" src="./assets/flappy/pipebottom.png">
+            <img id="flapPipeTop" src="./assets/flappy/pipetop.png">
+        </div>
+
     <!-- SCRIPTS -->
     <script src="libraries/jQuery/jquery-3.2.1.min.js"></script>
     <script src="libraries/chartJS/Chart.js"></script>
@@ -210,8 +214,12 @@
     <script src="classes/activation_function.js"></script>
     <script src="classes/generation.js"></script>
     <script src="classes/genome.js"></script>
+    <script src="classes/selection.js"></script>
+    <script src="classes/crossover.js"></script>
+    <script src="classes/mutation.js"></script>
 
     <script src="trex.js"></script>
+    <script src="flappy.js"></script>
     <script src="main.js"></script>
 </body>
 

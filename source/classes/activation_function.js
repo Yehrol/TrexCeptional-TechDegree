@@ -18,6 +18,11 @@ class activationFunction {
 }
 
 class sigmoid extends activationFunction {
+	constructor() {
+		// Parent constructor
+		super();
+	}
+
 	normal(x) {
 		return 1/(1+Math.pow(Math.E, -x));
 	}
@@ -28,6 +33,11 @@ class sigmoid extends activationFunction {
 }
 
 class tanh extends activationFunction{
+	constructor() {
+		// Parent constructor
+		super();
+	}
+	
 	normal(x) {
 		return Math.tanh(x);
 	}
