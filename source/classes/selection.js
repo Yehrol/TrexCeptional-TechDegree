@@ -87,7 +87,7 @@ class rouletteWheelSelection extends selection{
 
 	process(pGeneration) {
 		var selected = [];
-		var numberOfWantedParents = 2*Math.floor(Math.sqrt(pGeneration.genomes.length)/2);
+		var numberOfWantedParents = 2;//2*Math.floor(Math.sqrt(pGeneration.genomes.length)/2)
 
 		for (var i = 0; i < numberOfWantedParents; i++) { // Number of wanted genomes for breeding
 			var sum = 0;

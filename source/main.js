@@ -24,7 +24,7 @@ var runner;
 var gen;
 
 // Resfresh rate of the AI [FPS]
-var AIResfreshRate = 60;
+var AIResfreshRate = 180;
 
 // Var to calculate fitness
 var fitness = 0;
@@ -116,7 +116,7 @@ $(document).ready(function(){
 
 	// Neural net configuration
 	var topology;
-	var numberOfGenomes = 12; //Genomes per generation [minimum 4]
+	var numberOfGenomes = 50; //Genomes per generation [minimum 4]
 	var activation = new sigmoid();
 	var selectionMethod = new rouletteWheelSelection();
 	var crossoverMethod = new singlePointCrossover();
@@ -160,6 +160,7 @@ $(document).ready(function(){
 				gen = new Generation(topology, numberOfGenomes, activation, selectionMethod, crossoverMethod, mutationMethod);
 				// Draw the neural net
 				gen.drawNeuralNet(c,ctx);
+				fitnessChart.data.datasets[0].data = null;
 			}
 			else if (currentGameIndex == games.FLAPPY) {
 				runner = new flappyBird();
@@ -168,6 +169,7 @@ $(document).ready(function(){
 				gen = new Generation(topology, numberOfGenomes, activation, selectionMethod, crossoverMethod, mutationMethod);
 				// Draw the neural net
 				gen.drawNeuralNet(c,ctx);
+				fitnessChart.data.datasets[0].data = null;
 			}
 
 			changeRunningState(false);
@@ -218,6 +220,9 @@ function changeRunningState(state) {
 			// Simulate key press to start the game
 			simulateKeyPress(38, "keydown");
 		}
+		else if (currentGameIndex == games.FLAPPY) {
+			runner.game.run = true;
+		}
 	}
 	else{
 		$("#stateBtn").html('START<i class="material-icons right">power_settings_new</i>');
@@ -226,6 +231,9 @@ function changeRunningState(state) {
 		if (currentGameIndex == games.TREX) {
 			// Stop the trex game
 			runner.stop();
+		}
+		else if (currentGameIndex == games.FLAPPY) {
+			runner.game.run = false;
 		}
 	}
 }
@@ -273,15 +281,15 @@ function startIA(gameValue) {
 
 		    if (runner.game.birds[0].x <= gameValue[2][1].x) {
 		    	normalizedPipe1 = gameValue[2][0].height / 330;
-		    	normalizedPipe2 = gameValue[2][1].y / 450;
+		    	normalizedPipe2 = (gameValue[2][1].height - gameValue[2][1].y) / 450;
 		    }
 		    else if (runner.game.birds[0].x > gameValue[2][1].x) {
 		    	normalizedPipe1 = gameValue[2][2].height / 330;
-		    	normalizedPipe2 = gameValue[2][3].y / 450;
+		    	normalizedPipe2 = (gameValue[2][3].height - gameValue[2][3].y) / 450;
 		    }
 		    else if (runner.game.birds[0].x > gameValue[2][3].x) {
-		    	normalizedPipe1 = gameValue[2][2].height / 330;
-		    	normalizedPipe2 = gameValue[2][3].y / 450;
+		    	normalizedPipe1 = gameValue[2][4].height / 330;
+		    	normalizedPipe2 = (gameValue[2][5].height - gameValue[2][3].y) / 450;
 		    }
 
 		    // Create the input array for the neural network
@@ -302,7 +310,7 @@ function startIA(gameValue) {
 			lastValue = gameValue[1];
 		}
 		else if (currentGameIndex == games.FLAPPY) {
-			fitness = runner.game.score;
+			fitness = runner.game.score**4;
 		}
 		
 		if (currentGameIndex == games.TREX) {
