@@ -8,17 +8,17 @@
 // Set the state of the AI
 var isRunning = false;
 
-// Store the current game index (1 is the trex game)
-var currentGameIndex = 1;
-
-// Game variable
-var runner;
-
 //
 var games = {
 	TREX: 1,
 	FLAPPY: 2
 }
+
+// Store the current game index (1 is the trex game)
+var currentGameIndex = games.FLAPPY;
+
+// Game variable
+var runner;
 
 // Neural net variable
 var gen;
@@ -29,12 +29,6 @@ var AIResfreshRate = 60;
 // Var to calculate fitness
 var fitness = 0;
 var lastValue = 1000;
-
-// Max values
-var maxVelocity;
-var maxDistance;
-var maxYPosition;
-var maxSize;
 
 // Reference to the fitness chart
 var fitnessChart;
@@ -75,7 +69,7 @@ $(document).ready(function(){
 	        {
 	            label: "Best fitness",
 	            fill: true,
-	            lineTension: 0.2,
+	            lineTension: 0.1,
 	            backgroundColor: "rgba(75,192,192,0.4)",
 	            borderColor: "rgba(75,192,192,1)",
 	            borderCapStyle: 'butt',
@@ -120,24 +114,26 @@ $(document).ready(function(){
 		$('select').material_select();
 	});
 
-    // Instanciate the game
-    //runner = new Runner('.interstitial-wrapper');
-    runner = new flappyBird();
-    log(runner);
-
-    // Get the max values [trex]
-   /* maxVelocity = runner.config.MAX_SPEED;
-	maxDistance = 600 + 25;
-	maxYPosition = 105;
-	maxSize = runner.config.MAX_OBSTACLE_LENGTH;*/
-
 	// Neural net configuration
-	var topology = [1,2,1];
+	var topology;
 	var numberOfGenomes = 12; //Genomes per generation [minimum 4]
 	var activation = new sigmoid();
 	var selectionMethod = new rouletteWheelSelection();
 	var crossoverMethod = new singlePointCrossover();
 	var mutationMethod = new mutationWithRate(0.2); // [0..1]
+
+    // Instanciate the game
+    if (currentGameIndex == games.TREX) {
+    	$("select[name=gameSelector] option[value=1]").prop('selected', 'selected');
+    	topology = [1,2,1];
+    	//topology = [4,4,1];
+    	runner = new Runner('.interstitial-wrapper');
+    }
+    else if (currentGameIndex == games.FLAPPY) {
+    	$("select[name=gameSelector] option[value=2]").prop('selected', 'selected');
+    	topology = [3,3,1];
+    	runner = new flappyBird();
+    }
 
 	// Create a new generation
     gen = new Generation(topology, numberOfGenomes, activation, selectionMethod, crossoverMethod, mutationMethod);
@@ -156,12 +152,25 @@ $(document).ready(function(){
 
 			// Change the game depending the option selected
 			if (currentGameIndex == games.TREX) {
+				$('.interstitial-wrapper').html('<div id="main-content"><div class="icon icon-offline" alt="" style="visibility: hidden;"></div></div>');
+				$('.interstitial-wrapper').append('<div id="offline-resources"><img id="offline-resources-1x" src="assets/default_100_percent/100-offline-sprite.png"><img id="offline-resources-2x" src="assets/default_200_percent/200-offline-sprite.png"></div>');
 				runner = new Runner('.interstitial-wrapper');
-				log("test");
+
+				topology = [1,2,1];
+				gen = new Generation(topology, numberOfGenomes, activation, selectionMethod, crossoverMethod, mutationMethod);
+				// Draw the neural net
+				gen.drawNeuralNet(c,ctx);
 			}
 			else if (currentGameIndex == games.FLAPPY) {
-				
+				runner = new flappyBird();
+
+				topology = [3,3,1];
+				gen = new Generation(topology, numberOfGenomes, activation, selectionMethod, crossoverMethod, mutationMethod);
+				// Draw the neural net
+				gen.drawNeuralNet(c,ctx);
 			}
+
+			changeRunningState(false);
 		}
 	});
     
@@ -175,44 +184,60 @@ $(document).ready(function(){
 			}
 		}
 		else if (currentGameIndex == games.FLAPPY) {
-			gameValue = ;
+			if (typeof runner.game.backgroundSpeed != "undefined") {
+				if (runner.game.pipes.length > 0) {
+					gameValue = [runner.game.backgroundSpeed, runner.game.birds[0].y, runner.game.pipes];
+				}
+			}
 		}
 
-		startIA(gameValue);
+		if (typeof gameValue != "undefined") {
+			startIA(gameValue);
+		}
 	}, 1000 / AIResfreshRate);
 });
 
 // Change the state of the AI
-function changeRunningState() {
-	// Change the state
-	isRunning = !isRunning;
+function changeRunningState(state) {
+	if (typeof state == "undefined") {
+		// Change the state
+		isRunning = !isRunning;
+	}
+	else {
+		isRunning = state;
+	}
 
 	// Show if the AI is started or stopped
 	if (isRunning == true) {
 		$("#stateBtn").html('STOP<i class="material-icons right">power_settings_new</i>');
 		Materialize.toast('AI Started', 4000);
 
-		// Unpause the trex game
-		runner.play();
-		// Simulate key press to start the game
-		simulateKeyPress(38, "keydown");
+		if (currentGameIndex == games.TREX) {
+			// Unpause the trex game
+			runner.play();
+			// Simulate key press to start the game
+			simulateKeyPress(38, "keydown");
+		}
 	}
 	else{
 		$("#stateBtn").html('START<i class="material-icons right">power_settings_new</i>');
 		Materialize.toast('AI Stopped', 4000);
 
-		// Stop the trex game
-		runner.stop();
+		if (currentGameIndex == games.TREX) {
+			// Stop the trex game
+			runner.stop();
+		}
 	}
 }
 
 // 
 function startIA(gameValue) {
     // Show some value for debuging
-    $('#Velocity').html(gameValue[0]);
+
+    /*$('#Velocity').html(gameValue[0]);
     $('#Distance').html(gameValue[1]);
     $('#yPosition').html(gameValue[2]);
-    $('#Size').html(gameValue[3]);
+    $('#Size').html(gameValue[3]);*/
 
 	// Check if the AI should "run"
 	if (isRunning == true) {
@@ -227,34 +252,84 @@ function startIA(gameValue) {
 			timer = 0;
 		}
 
-		// Normalized data
-		var normalizedVelocity = gameValue[0] / maxVelocity;
-	    var normalizedDistance = gameValue[1] / maxDistance;
-	    var normalizedYPosition = gameValue[2] / maxYPosition;
-	    var normalizedSize = gameValue[3] / maxSize;
+		var input;
 
-	    // Create the input array for the neural network
-		var input = [normalizedDistance];//,normalizedVelocity,normalizedSize,normalizedYPosition
+		if (currentGameIndex == games.TREX) {
+			// Normalized data
+			var normalizedVelocity = gameValue[0] / runner.config.MAX_SPEED;
+		    var normalizedDistance = gameValue[1] / (600 + 25);
+		    var normalizedYPosition = gameValue[2] / 105;
+		    var normalizedSize = gameValue[3] / runner.config.MAX_OBSTACLE_LENGTH;
+
+	    	// Create the input array for the neural network
+			input = [normalizedDistance];//,normalizedVelocity,normalizedSize,normalizedYPosition
+		}
+		else if (currentGameIndex == games.FLAPPY) {
+			//flappy bird
+		    var nomalizedBgSpeed = gameValue[0];
+		    var normalizedY = gameValue[1] / 500;
+		    var normalizedPipe1;
+		    var normalizedPipe2;
+
+		    if (runner.game.birds[0].x <= gameValue[2][1].x) {
+		    	normalizedPipe1 = gameValue[2][0].height / 330;
+		    	normalizedPipe2 = gameValue[2][1].y / 450;
+		    }
+		    else if (runner.game.birds[0].x > gameValue[2][1].x) {
+		    	normalizedPipe1 = gameValue[2][2].height / 330;
+		    	normalizedPipe2 = gameValue[2][3].y / 450;
+		    }
+		    else if (runner.game.birds[0].x > gameValue[2][3].x) {
+		    	normalizedPipe1 = gameValue[2][2].height / 330;
+		    	normalizedPipe2 = gameValue[2][3].y / 450;
+		    }
+
+		    // Create the input array for the neural network
+		    input = [normalizedY,normalizedPipe1,normalizedPipe2];
+		}
 
 		// Run the generation
 		var result = gen.run(input);
 
 		// Make a game action
-		trexAction(result);
+		gameAction(currentGameIndex, result);
 
-		// Get the number of obstacle passed
-		if (gameValue[1] > lastValue) {
-			fitness++;
+		if (currentGameIndex == games.TREX) {
+			// Get the number of obstacle passed [Trex]
+			if (gameValue[1] > lastValue) {
+				fitness++;
+			}
+			lastValue = gameValue[1];
 		}
-		lastValue = gameValue[1];
+		else if (currentGameIndex == games.FLAPPY) {
+			fitness = runner.game.score;
+		}
+		
+		if (currentGameIndex == games.TREX) {
+			// When the AI die
+			if (runner.crashed) {
+				// Restart the game
+				restartGame();
 
-		// When the AI die
-		if (runner.crashed) {
-			// Restart the game
-			restartGame();
+				// Check if the game has restarted before changing generation
+				if (!runner.crashed) {
+					// Change the generation and save the fitness
+					gen.nextGen(fitness, fitnessChart);
 
-			// Check if the game has restarted before changing generation
-			if (!runner.crashed) {
+					// Reset the value (counting obstacle)
+					fitness = 0;
+					lastValue = 1000
+
+					updateInterface();
+				}
+			}
+		}
+		else if (currentGameIndex == games.FLAPPY) {
+			// When the AI die
+			if (runner.game.isItEnd()) {
+				// Restart the game
+				restartGame();
+
 				// Change the generation and save the fitness
 				gen.nextGen(fitness, fitnessChart);
 
@@ -268,23 +343,25 @@ function startIA(gameValue) {
 	}
 }
 
-function flappyAction(result) {
-	// Make action depending the neural net output
-	if (result > 0.5) { // greater than 0.5 [press up]
-		//this.birds[0].flap()
-	}	
-}
-
-function trexAction(result) {
-	// Make action depending the neural net output
-	if (result > 0.6) { // greater than 0.5 [press up]
-		simulateKeyPress(38, "keydown");
+function gameAction(game, result) {
+	if (game == games.TREX) {
+		// Make action depending the neural net output
+		if (result > 0.6) { // greater than 0.6 [press up]
+			simulateKeyPress(38, "keydown");
+		}
+		else if (result < 0.4) { // less than 0.4 [press down]
+			simulateKeyPress(40, "keydown");
+		}
+		else {
+			//do nothing
+		}
 	}
-	else if (result < 0.4) { // less than 0.4 [press down]
-		simulateKeyPress(40, "keydown");
-	}
-	else {
-		//do nothing
+	else if (game == games.FLAPPY) {
+		// Make action depending the neural net output
+		if (result > 0.5) { // greater than 0.5 [press up]
+			runner.game.birds[0].flap();
+			//this.birds[0].flap()
+		}
 	}
 }
 
@@ -296,8 +373,14 @@ function updateInterface() {
 
 //
 function restartGame() {
-	simulateKeyPress(38, "keyup");
 	ctx.clearRect(0,0,c.width,c.height);
+
+	if (currentGameIndex == games.TREX) {
+		simulateKeyPress(38, "keyup");
+	}
+	else if (currentGameIndex == games.FLAPPY) {
+		runner.game.start();
+	}
 }
 
 

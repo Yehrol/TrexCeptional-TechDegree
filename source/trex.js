@@ -13,9 +13,9 @@
      */
     function Runner(outerContainerId, opt_config) {
         // Singleton
-        if (Runner.instance_) {
+        /*if (Runner.instance_) {
             return Runner.instance_;
-        }
+        }*/
         Runner.instance_ = this;
 
         this.outerContainerEl = document.querySelector(outerContainerId);
