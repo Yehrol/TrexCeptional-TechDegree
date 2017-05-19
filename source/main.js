@@ -24,7 +24,7 @@ var runner;
 var gen;
 
 // Resfresh rate of the AI [FPS]
-var AIResfreshRate = 60;
+var AIResfreshRate = 180;
 
 // Var to calculate fitness
 var fitness = 0;
@@ -249,8 +249,6 @@ function startIA(gameValue) {
 
 	// Check if the AI should "run"
 	if (isRunning == true) {
-		// Draw the neural net
-		gen.drawNeuralNet(c,ctx);
 
 		// timer
 		timer++;
@@ -258,6 +256,8 @@ function startIA(gameValue) {
 			timePassed++;
 			$("#timeIndex").html(timePassed);
 			timer = 0;
+			// Draw the neural net
+			gen.drawNeuralNet(c,ctx);
 		}
 
 		var input;
@@ -386,7 +386,7 @@ function updateInterface() {
 
 //
 function restartGame() {
-	ctx.clearRect(0,0,c.width,c.height);
+	//ctx.clearRect(0,0,c.width,c.height);
 
 	if (currentGameIndex == games.TREX) {
 		simulateKeyPress(38, "keyup");

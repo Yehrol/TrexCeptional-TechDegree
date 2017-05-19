@@ -44,7 +44,7 @@ class flappyBird{
 }
 
 var game;
-var FPS = 60;
+var FPS = 180;
 var maxScore=0;
 
 var images = {
