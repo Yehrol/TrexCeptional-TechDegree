@@ -24,7 +24,7 @@ var runner;
 var gen;
 
 // Resfresh rate of the AI [FPS]
-var AIResfreshRate = 180;
+var AIResfreshRate = 60;
 
 // Var to calculate fitness
 var fitness = 0;
@@ -131,7 +131,7 @@ $(document).ready(function(){
     }
     else if (currentGameIndex == games.FLAPPY) {
     	$("select[name=gameSelector] option[value=2]").prop('selected', 'selected');
-    	topology = [3,3,1];
+    	topology = [2,2,1];
     	runner = new flappyBird();
     }
 
@@ -165,7 +165,7 @@ $(document).ready(function(){
 			else if (currentGameIndex == games.FLAPPY) {
 				runner = new flappyBird();
 
-				topology = [3,3,1];
+				topology = [2,2,1];
 				gen = new Generation(topology, numberOfGenomes, activation, selectionMethod, crossoverMethod, mutationMethod);
 				// Draw the neural net
 				gen.drawNeuralNet(c,ctx);
@@ -188,7 +188,7 @@ $(document).ready(function(){
 		else if (currentGameIndex == games.FLAPPY) {
 			if (typeof runner.game.backgroundSpeed != "undefined") {
 				if (runner.game.pipes.length > 0) {
-					gameValue = [runner.game.backgroundSpeed, runner.game.birds[0].y, runner.game.pipes];
+					gameValue = [runner.game.birds[0].y, runner.game.pipes];
 				}
 			}
 		}
@@ -274,26 +274,31 @@ function startIA(gameValue) {
 		}
 		else if (currentGameIndex == games.FLAPPY) {
 			//flappy bird
-		    var nomalizedBgSpeed = gameValue[0];
-		    var normalizedY = gameValue[1] / 500;
-		    var normalizedPipe1;
-		    var normalizedPipe2;
+		    var normalizedY = gameValue[0] / runner.game.height;
+		    var normalizedPipe;
 
-		    if (runner.game.birds[0].x <= gameValue[2][1].x) {
-		    	normalizedPipe1 = gameValue[2][0].height / 330;
-		    	normalizedPipe2 = (gameValue[2][1].height - gameValue[2][1].y) / 450;
+		    var nextHoll = 0;
+			for(var i = 0; i < runner.game.pipes.length; i+=2){
+				if(runner.game.pipes[i].x + runner.game.pipes[i].width > runner.game.birds[0].x){
+					nextHoll = runner.game.pipes[i].height/runner.game.height;
+					break;
+				}
+			}
+
+			normalizedPipe = nextHoll;
+
+		    /*if (runner.game.birds[0].x <= gameValue[1][1].x) {
+		    	normalizedPipe = gameValue[1][0].height / 500;
 		    }
-		    else if (runner.game.birds[0].x > gameValue[2][1].x) {
-		    	normalizedPipe1 = gameValue[2][2].height / 330;
-		    	normalizedPipe2 = (gameValue[2][3].height - gameValue[2][3].y) / 450;
+		    else if (runner.game.birds[0].x > gameValue[1][1].x) {
+		    	normalizedPipe = gameValue[1][2].height / 500;
 		    }
-		    else if (runner.game.birds[0].x > gameValue[2][3].x) {
-		    	normalizedPipe1 = gameValue[2][4].height / 330;
-		    	normalizedPipe2 = (gameValue[2][5].height - gameValue[2][3].y) / 450;
-		    }
+		    else if (runner.game.birds[0].x > gameValue[1][3].x) {
+		    	normalizedPipe = gameValue[1][4].height / 500;
+		    }*/
 
 		    // Create the input array for the neural network
-		    input = [normalizedY,normalizedPipe1,normalizedPipe2];
+		    input = [normalizedY,normalizedPipe];
 		}
 
 		// Run the generation

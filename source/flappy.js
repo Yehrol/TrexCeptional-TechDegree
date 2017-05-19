@@ -44,7 +44,7 @@ class flappyBird{
 }
 
 var game;
-var FPS = 180;
+var FPS = 60;
 var maxScore=0;
 
 var images = {
@@ -284,7 +284,6 @@ Game.prototype.display = function(){
 	this.ctx.font="20px Oswald, sans-serif";
 	this.ctx.fillText("Score : "+ this.score, 10, 25);
 	this.ctx.fillText("Max Score : "+this.maxScore, 10, 50);
-	this.ctx.fillText("Generation : "+this.generation, 10, 75);
 	//this.ctx.fillText("Alive : "+this.alives+" / "+Neuvol.options.population, 10, 100);
 
 	var self = this;
