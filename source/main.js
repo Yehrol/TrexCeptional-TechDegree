@@ -378,12 +378,6 @@ function gameAction(game, result) {
 	}
 }
 
-// Update the interface
-function updateInterface() {
-	$('#generationIndex').html(gen.generation + 1);
-	$('#genomeIndex').html(gen.currentGenome + 1 + "/" + gen.genomes.length);
-}
-
 //
 function restartGame() {
 	//ctx.clearRect(0,0,c.width,c.height);
@@ -402,6 +396,12 @@ function restartGame() {
 */
 
 
+
+// Update the interface
+function updateInterface() {
+	$('#generationIndex').html(gen.generation + 1);
+	$('#genomeIndex').html(gen.currentGenome + 1 + "/" + gen.genomes.length);
+}
 
 // Resize the canvas depending de windows size
 function resizeNeuralNetCanvas() {
