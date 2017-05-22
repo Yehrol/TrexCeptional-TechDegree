@@ -1,18 +1,18 @@
 class gameManager {
 	//
 	constructor() {
-		if (new.target === activationFunction) {
-			throw new TypeError("Cannot construct activationFunction instances directly");
+		if (new.target === gameManager) {
+			throw new TypeError("Cannot construct gameManager instances directly");
 		}
 	}
 
-	getNormalizedInputValues() {}
-	action() {}
-	fitness() {}
-	isDead() {}
-	play() {}
-	pause() {}
-	restart() {}
+	getNormalizedInputValues(game) { throw new Error("Must override method"); }
+	action(game, result) { throw new Error("Must override method"); }
+	fitness(game) { throw new Error("Must override method"); }
+	isDead(game) { throw new Error("Must override method"); }
+	play(game) { throw new Error("Must override method"); }
+	pause(game) { throw new Error("Must override method"); }
+	restart(game) { throw new Error("Must override method"); }
 }
 
 class trexManager extends gameManager {
@@ -20,36 +20,67 @@ class trexManager extends gameManager {
 		// Parent constructor
 		super();
 
-		this.defaultTopology = [1,2,1];
+		this.defaultTopology = [1,1,1]; //4,4,1
 		this.defaultNumberOfGenomes = 12;
+		this.tmpFitness = 0;
+		this.lastXpos = 1000;
 	}
 
-	getNormalizedInputValues() {
+	getNormalizedInputValues(game) {
+		var inputs = [];
 
+		var maxVelocity = 13;
+		var maxDistance = 600 + 25;
+		var maxYPosition = 105;
+		var maxSize = 3;
+
+		var normalizedVelocity = game.currentSpeed.toFixed(3) / maxVelocity;
+	    var normalizedDistance = game.horizon.obstacles[0].xPos / maxDistance;
+	    var normalizedYPosition = game.horizon.obstacles[0].yPos / maxYPosition;
+	    var normalizedSize = game.horizon.obstacles[0].size / maxSize;
+
+	    inputs = [normalizedDistance];//,normalizedVelocity,normalizedSize,normalizedYPosition
+
+		return inputs;
 	}
 
-	action() {
-
+	action(game, result) {
+		// Make action depending the neural net output
+		if (result > 0.6) { // greater than 0.6 [press up]
+			simulateKeyPress(38, "keydown");
+		}
+		else if (result < 0.4) { // less than 0.4 [press down]
+			simulateKeyPress(40, "keydown");
+		}
+		else {
+			//do nothing
+		}
 	}
 
-	fitness() {
-
+	fitness(game) {
+		if (game.horizon.obstacles[0].xPos > this.lastXpos) {
+			this.tmpFitness++;
+		}
+		this.lastXpos = gameValue[1];
 	}
 
-	isDead() {
-
+	isDead(game) {
+		return game.crashed;
 	}
 
-	play() {
-
+	play(game) {
+		// Unpause the trex game
+		game.play();
+		// Simulate key press to start the game
+		simulateKeyPress(38, "keydown");
 	}
 
-	pause() {
-
+	pause(game) {
+		game.stop();
 	}
 
-	restart() {
-
+	restart(game) {
+		game.restart();
 	}
 }
 
@@ -60,19 +91,55 @@ class flappyManager extends gameManager {
 		
 		this.defaultTopology = [2,2,1];
 		this.defaultNumberOfGenomes = 50;
+		this.tmpFitness = 0;
 	}
 
-	
+	getNormalizedInputValues(game) {
+		var inputs = [];
+
+		var normalizedY = game.game.birds[0].y / game.game.height;
+	    var normalizedPipe;
+
+	    var nextHoll = 0;
+		for(var i = 0; i < game.game.pipes.length; i+=2){
+			if(game.game.pipes[i].x + game.game.pipes[i].width > game.game.birds[0].x){
+				nextHoll = game.game.pipes[i].height/game.game.height;
+				break;
+			}
+		}
+
+		normalizedPipe = nextHoll;
+
+	    // Create the input array for the neural network
+	    inputs = [normalizedY,normalizedPipe];
+
+		return inputs;
+	}
+
+	action(game, result) {
+		// Make action depending the neural net output
+		if (result > 0.5) { // greater than 0.5 [press up]
+			game.game.birds[0].flap();
+		}
+	}
+
+	fitness(game) {
+		this.tmpFitness = game.game.score**4;
+	}
+
+	isDead(game) {
+		return game.game.isItEnd();
+	}
+
+	play(game) {
+		game.game.run = true;
+	}
+
+	pause(game) {
+		game.game.run = false;
+	}
+
+	restart(game) {
+		game.game.start();
+	}
 }
-
-/*
-inputValue
-normalizedValue
-fitnessCalcul
-isDead
-makeAction
-restart
-
-play
-pause
-*/

@@ -13,7 +13,7 @@ class selection {
 		}
 	}
 
-	process(pGeneration) {}
+	process(pGeneration) { throw new Error("Must override method"); }
 }
 
 // NOT USED AND MUST BE CHANGED

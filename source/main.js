@@ -287,16 +287,6 @@ function startIA(gameValue) {
 
 			normalizedPipe = nextHoll;
 
-		    /*if (runner.game.birds[0].x <= gameValue[1][1].x) {
-		    	normalizedPipe = gameValue[1][0].height / 500;
-		    }
-		    else if (runner.game.birds[0].x > gameValue[1][1].x) {
-		    	normalizedPipe = gameValue[1][2].height / 500;
-		    }
-		    else if (runner.game.birds[0].x > gameValue[1][3].x) {
-		    	normalizedPipe = gameValue[1][4].height / 500;
-		    }*/
-
 		    // Create the input array for the neural network
 		    input = [normalizedY,normalizedPipe];
 		}
@@ -323,18 +313,15 @@ function startIA(gameValue) {
 			if (runner.crashed) {
 				// Restart the game
 				restartGame();
+				
+				// Change the generation and save the fitness
+				gen.nextGen(fitness, fitnessChart);log(fitness);
 
-				// Check if the game has restarted before changing generation
-				if (!runner.crashed) {
-					// Change the generation and save the fitness
-					gen.nextGen(fitness, fitnessChart);
+				// Reset the value (counting obstacle)
+				fitness = 0;
+				lastValue = 1000
 
-					// Reset the value (counting obstacle)
-					fitness = 0;
-					lastValue = 1000
-
-					updateInterface();
-				}
+				updateInterface();
 			}
 		}
 		else if (currentGameIndex == games.FLAPPY) {
@@ -383,7 +370,7 @@ function restartGame() {
 	//ctx.clearRect(0,0,c.width,c.height);
 
 	if (currentGameIndex == games.TREX) {
-		simulateKeyPress(38, "keyup");
+		runner.restart();
 	}
 	else if (currentGameIndex == games.FLAPPY) {
 		runner.game.start();

@@ -13,7 +13,7 @@ class mutation {
 		}
 	}
 
-	process(pNextGenomes) {}
+	process(pNextGenomes) { throw new Error("Must override method"); }
 }
 
 class mutationWithoutRate extends mutation {

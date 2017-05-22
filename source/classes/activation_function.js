@@ -13,8 +13,8 @@ class activationFunction {
 		}
 	}
 
-	normal(x) {}
-	derivative(x) {}
+	normal(x) { throw new Error("Must override method"); }
+	derivative(x) { throw new Error("Must override method"); }
 }
 
 class sigmoid extends activationFunction {

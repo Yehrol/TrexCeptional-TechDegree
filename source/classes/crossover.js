@@ -13,7 +13,7 @@ class crossover {
 		}
 	}
 
-	process(pGeneration,pSelectedGenomes) {}
+	process(pGeneration,pSelectedGenomes) { throw new Error("Must override method"); }
 }
 
 class singlePointCrossover extends crossover {
