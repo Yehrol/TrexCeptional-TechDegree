@@ -401,6 +401,7 @@ function importNeuralNetwork(){
 	    Materialize.toast('Neural network succesfully imported', 4000)
 
 	    // Reset everything
+	    myGameManager.restart(runner);
 		fitnessChart.data.datasets[0].data = null;
 	    timePassed = 0;
 	    $("#timeIndex").html(timePassed);
