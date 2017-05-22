@@ -6,6 +6,7 @@ class gameManager {
 		}
 	}
 
+	instanciateGame() { throw new Error("Must override method"); }
 	getNormalizedInputValues(game) { throw new Error("Must override method"); }
 	action(game, result) { throw new Error("Must override method"); }
 	fitness(game) { throw new Error("Must override method"); }
@@ -26,20 +27,26 @@ class trexManager extends gameManager {
 		this.lastXpos = 1000;
 	}
 
+	instanciateGame() {
+		return new Runner('.interstitial-wrapper');
+	}
+
 	getNormalizedInputValues(game) {
 		var inputs = [];
 
-		var maxVelocity = 13;
-		var maxDistance = 600 + 25;
-		var maxYPosition = 105;
-		var maxSize = 3;
+		if (typeof game.horizon.obstacles[0] != "undefined") {
+			var maxVelocity = 13;
+			var maxDistance = 600 + 25;
+			var maxYPosition = 105;
+			var maxSize = 3;
 
-		var normalizedVelocity = game.currentSpeed.toFixed(3) / maxVelocity;
-	    var normalizedDistance = game.horizon.obstacles[0].xPos / maxDistance;
-	    var normalizedYPosition = game.horizon.obstacles[0].yPos / maxYPosition;
-	    var normalizedSize = game.horizon.obstacles[0].size / maxSize;
+			var normalizedVelocity = game.currentSpeed.toFixed(3) / maxVelocity;
+		    var normalizedDistance = game.horizon.obstacles[0].xPos / maxDistance;
+		    var normalizedYPosition = game.horizon.obstacles[0].yPos / maxYPosition;
+		    var normalizedSize = game.horizon.obstacles[0].size / maxSize;
 
-	    inputs = [normalizedDistance];//,normalizedVelocity,normalizedSize,normalizedYPosition
+		    inputs = [normalizedDistance];//,normalizedVelocity,normalizedSize,normalizedYPosition
+		}
 
 		return inputs;
 	}
@@ -61,7 +68,8 @@ class trexManager extends gameManager {
 		if (game.horizon.obstacles[0].xPos > this.lastXpos) {
 			this.tmpFitness++;
 		}
-		this.lastXpos = gameValue[1];
+		this.lastXpos = game.horizon.obstacles[0].xPos;
+		//log(this.tmpFitness);
 	}
 
 	isDead(game) {
@@ -94,24 +102,32 @@ class flappyManager extends gameManager {
 		this.tmpFitness = 0;
 	}
 
+	instanciateGame() {
+		return new flappyBird();
+	}
+
 	getNormalizedInputValues(game) {
 		var inputs = [];
 
-		var normalizedY = game.game.birds[0].y / game.game.height;
-	    var normalizedPipe;
+		if (typeof game.game.backgroundSpeed != "undefined") {
+			if (game.game.pipes.length > 0) {
+				var normalizedY = game.game.birds[0].y / game.game.height;
+			    var normalizedPipe;
 
-	    var nextHoll = 0;
-		for(var i = 0; i < game.game.pipes.length; i+=2){
-			if(game.game.pipes[i].x + game.game.pipes[i].width > game.game.birds[0].x){
-				nextHoll = game.game.pipes[i].height/game.game.height;
-				break;
+			    var nextHoll = 0;
+				for(var i = 0; i < game.game.pipes.length; i+=2){
+					if(game.game.pipes[i].x + game.game.pipes[i].width > game.game.birds[0].x){
+						nextHoll = game.game.pipes[i].height/game.game.height;
+						break;
+					}
+				}
+
+				normalizedPipe = nextHoll;
+
+			    // Create the input array for the neural network
+			    inputs = [normalizedY,normalizedPipe];
 			}
 		}
-
-		normalizedPipe = nextHoll;
-
-	    // Create the input array for the neural network
-	    inputs = [normalizedY,normalizedPipe];
 
 		return inputs;
 	}

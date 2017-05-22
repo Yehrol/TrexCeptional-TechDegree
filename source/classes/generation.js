@@ -62,12 +62,12 @@ class Generation {
 
 			// Create a new generation
 			var selected = this.selection.process(this);
-			log(selected);
+			//log(selected);
 			var newGen = this.crossover.process(this,selected);
-			log(newGen);
+			//log(newGen);
 			var newMutatedGen = this.mutation.process(newGen);
 			this.genomes = newMutatedGen;
-			log("-----------------------");
+			//log("-----------------------");
 		}
 		else {
 			this.currentGenome++;

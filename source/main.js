@@ -8,11 +8,18 @@
 // Set the state of the AI
 var isRunning = false;
 
+var myGameManager;
+
 //
 var games = {
 	TREX: 1,
 	FLAPPY: 2
 }
+
+var activation;
+var selectionMethod;
+var crossoverMethod;
+var mutationMethod;
 
 // Store the current game index (1 is the trex game)
 var currentGameIndex = games.FLAPPY;
@@ -43,6 +50,10 @@ var neuralNetCanvas = document.getElementById('neuralNet');
 // Var used for the timer
 var timer = 0;
 var timePassed = 0;
+
+// Resfresh rate for the neural net preview
+var nnPreviewCounter = 0;
+var nnPreviewRefreshRate = 10; // [FPS]
 
 // When the page is fully loaded
 $(document).ready(function(){
@@ -110,39 +121,41 @@ $(document).ready(function(){
     window.addEventListener('resize', resizeNeuralNetCanvas, false);
 
 	// Enable the selector
-	$(document).ready(function() {
-		$('select').material_select();
-	});
+	$(document).ready(function() { $('select').material_select(); });
 
 	// Neural net configuration
-	var topology;
-	var numberOfGenomes = 50; //Genomes per generation [minimum 4]
-	var activation = new sigmoid();
-	var selectionMethod = new rouletteWheelSelection();
-	var crossoverMethod = new singlePointCrossover();
-	var mutationMethod = new mutationWithRate(0.2); // [0..1]
+	activation = new sigmoid();
+	selectionMethod = new rouletteWheelSelection();
+	crossoverMethod = new singlePointCrossover();
+	mutationMethod = new mutationWithRate(0.2); // [0..1]
 
     // Instanciate the game
     if (currentGameIndex == games.TREX) {
     	$("select[name=gameSelector] option[value=1]").prop('selected', 'selected');
-    	topology = [1,2,1];
-    	//topology = [4,4,1];
-    	runner = new Runner('.interstitial-wrapper');
+
+    	myGameManager = new trexManager();
     }
     else if (currentGameIndex == games.FLAPPY) {
     	$("select[name=gameSelector] option[value=2]").prop('selected', 'selected');
-    	topology = [2,2,1];
-    	runner = new flappyBird();
+
+    	myGameManager = new flappyManager();
     }
 
+    runner = myGameManager.instanciateGame();
+
 	// Create a new generation
-    gen = new Generation(topology, numberOfGenomes, activation, selectionMethod, crossoverMethod, mutationMethod);
+    gen = new Generation(myGameManager.defaultTopology, myGameManager.defaultNumberOfGenomes, activation, selectionMethod, crossoverMethod, mutationMethod);
 
 	// Update the interface
 	updateInterface();
 
     // Resize the canvas depending the container size
     resizeNeuralNetCanvas();
+
+	// Event when the game is changed
+	$( "#neuralNetSelector" ).change(function() {
+		printSelectedNeuralNet($('#neuralNetSelector').val());
+	});
 
 	// Event when the game is changed
 	$( "select[name=gameSelector]" ).change(function() {
@@ -154,23 +167,18 @@ $(document).ready(function(){
 			if (currentGameIndex == games.TREX) {
 				$('.interstitial-wrapper').html('<div id="main-content"><div class="icon icon-offline" alt="" style="visibility: hidden;"></div></div>');
 				$('.interstitial-wrapper').append('<div id="offline-resources"><img id="offline-resources-1x" src="assets/default_100_percent/100-offline-sprite.png"><img id="offline-resources-2x" src="assets/default_200_percent/200-offline-sprite.png"></div>');
-				runner = new Runner('.interstitial-wrapper');
-
-				topology = [1,2,1];
-				gen = new Generation(topology, numberOfGenomes, activation, selectionMethod, crossoverMethod, mutationMethod);
-				// Draw the neural net
-				gen.drawNeuralNet(c,ctx);
-				fitnessChart.data.datasets[0].data = null;
+				myGameManager = new trexManager();
 			}
 			else if (currentGameIndex == games.FLAPPY) {
-				runner = new flappyBird();
-
-				topology = [2,2,1];
-				gen = new Generation(topology, numberOfGenomes, activation, selectionMethod, crossoverMethod, mutationMethod);
-				// Draw the neural net
-				gen.drawNeuralNet(c,ctx);
-				fitnessChart.data.datasets[0].data = null;
+				myGameManager = new flappyManager();
 			}
+
+			runner = myGameManager.instanciateGame();
+
+			gen = new Generation(myGameManager.defaultTopology, myGameManager.defaultNumberOfGenomes, activation, selectionMethod, crossoverMethod, mutationMethod);
+			// Draw the neural net
+			gen.drawNeuralNet(c,ctx);
+			fitnessChart.data.datasets[0].data = null;
 
 			changeRunningState(false);
 		}
@@ -178,24 +186,7 @@ $(document).ready(function(){
     
     // 
 	setInterval(function(){
-		var gameValue
-		if (currentGameIndex == games.TREX) {
-			// Start when the first obstacle appear [TO CHANGE DEPENDING THE GAME]
-			if (typeof runner.horizon.obstacles[0] != "undefined") {
-				gameValue = [parseFloat(runner.currentSpeed.toFixed(3)), parseFloat(runner.horizon.obstacles[0].xPos), parseFloat(runner.horizon.obstacles[0].yPos), parseFloat(runner.horizon.obstacles[0].size)];
-			}
-		}
-		else if (currentGameIndex == games.FLAPPY) {
-			if (typeof runner.game.backgroundSpeed != "undefined") {
-				if (runner.game.pipes.length > 0) {
-					gameValue = [runner.game.birds[0].y, runner.game.pipes];
-				}
-			}
-		}
-
-		if (typeof gameValue != "undefined") {
-			startIA(gameValue);
-		}
+		startAI();
 	}, 1000 / AIResfreshRate);
 });
 
@@ -214,34 +205,18 @@ function changeRunningState(state) {
 		$("#stateBtn").html('STOP<i class="material-icons right">power_settings_new</i>');
 		Materialize.toast('AI Started', 4000);
 
-		if (currentGameIndex == games.TREX) {
-			// Unpause the trex game
-			runner.play();
-			// Simulate key press to start the game
-			simulateKeyPress(38, "keydown");
-		}
-		else if (currentGameIndex == games.FLAPPY) {
-			runner.game.run = true;
-		}
+		myGameManager.play(runner);
 	}
 	else{
 		$("#stateBtn").html('START<i class="material-icons right">power_settings_new</i>');
 		Materialize.toast('AI Stopped', 4000);
 
-		if (currentGameIndex == games.TREX) {
-			// Stop the trex game
-			runner.stop();
-		}
-		else if (currentGameIndex == games.FLAPPY) {
-			runner.game.run = false;
-		}
+		myGameManager.pause(runner);
 	}
 }
 
 // 
-function startIA(gameValue) {
-    // Show some value for debuging
-
+function startAI() {
     /*$('#Velocity').html(gameValue[0]);
     $('#Distance').html(gameValue[1]);
     $('#yPosition').html(gameValue[2]);
@@ -249,140 +224,81 @@ function startIA(gameValue) {
 
 	// Check if the AI should "run"
 	if (isRunning == true) {
+		var gameValue = myGameManager.getNormalizedInputValues(runner);
 
-		// timer
-		timer++;
-		if (timer >= AIResfreshRate) {
-			timePassed++;
-			$("#timeIndex").html(timePassed);
-			timer = 0;
-			// Draw the neural net
-			gen.drawNeuralNet(c,ctx);
-		}
+		if (gameValue.length > 0) {
 
-		var input;
-
-		if (currentGameIndex == games.TREX) {
-			// Normalized data
-			var normalizedVelocity = gameValue[0] / runner.config.MAX_SPEED;
-		    var normalizedDistance = gameValue[1] / (600 + 25);
-		    var normalizedYPosition = gameValue[2] / 105;
-		    var normalizedSize = gameValue[3] / runner.config.MAX_OBSTACLE_LENGTH;
-
-	    	// Create the input array for the neural network
-			input = [normalizedDistance];//,normalizedVelocity,normalizedSize,normalizedYPosition
-		}
-		else if (currentGameIndex == games.FLAPPY) {
-			//flappy bird
-		    var normalizedY = gameValue[0] / runner.game.height;
-		    var normalizedPipe;
-
-		    var nextHoll = 0;
-			for(var i = 0; i < runner.game.pipes.length; i+=2){
-				if(runner.game.pipes[i].x + runner.game.pipes[i].width > runner.game.birds[0].x){
-					nextHoll = runner.game.pipes[i].height/runner.game.height;
-					break;
-				}
+			// timer
+			timer++;
+			if (timer >= AIResfreshRate) {
+				timePassed++;
+				$("#timeIndex").html(timePassed);
+				timer = 0;
 			}
 
-			normalizedPipe = nextHoll;
-
-		    // Create the input array for the neural network
-		    input = [normalizedY,normalizedPipe];
-		}
-
-		// Run the generation
-		var result = gen.run(input);
-
-		// Make a game action
-		gameAction(currentGameIndex, result);
-
-		if (currentGameIndex == games.TREX) {
-			// Get the number of obstacle passed [Trex]
-			if (gameValue[1] > lastValue) {
-				fitness++;
+			// Neural net preview
+			nnPreviewCounter++;
+			if (nnPreviewCounter >= (AIResfreshRate / nnPreviewRefreshRate)) {
+				// Draw the neural net
+				gen.drawNeuralNet(c,ctx);
+				nnPreviewCounter = 0;
 			}
-			lastValue = gameValue[1];
-		}
-		else if (currentGameIndex == games.FLAPPY) {
-			fitness = runner.game.score**4;
-		}
-		
-		if (currentGameIndex == games.TREX) {
+
+			// Run the generation
+			var result = gen.run(gameValue);
+
+			// Make a game action
+			myGameManager.action(runner, result);
+
+			myGameManager.fitness(runner);
+			
 			// When the AI die
-			if (runner.crashed) {
+			if (myGameManager.isDead(runner)) {
 				// Restart the game
-				restartGame();
-				
+				myGameManager.restart(runner);
+
 				// Change the generation and save the fitness
-				gen.nextGen(fitness, fitnessChart);log(fitness);
+				gen.nextGen(myGameManager.tmpFitness, fitnessChart);
 
 				// Reset the value (counting obstacle)
 				fitness = 0;
 				lastValue = 1000
 
-				updateInterface();
-			}
-		}
-		else if (currentGameIndex == games.FLAPPY) {
-			// When the AI die
-			if (runner.game.isItEnd()) {
-				// Restart the game
-				restartGame();
-
-				// Change the generation and save the fitness
-				gen.nextGen(fitness, fitnessChart);
-
-				// Reset the value (counting obstacle)
-				fitness = 0;
-				lastValue = 1000
-
+				// Update the interface
 				updateInterface();
 			}
 		}
 	}
 }
 
-function gameAction(game, result) {
-	if (game == games.TREX) {
-		// Make action depending the neural net output
-		if (result > 0.6) { // greater than 0.6 [press up]
-			simulateKeyPress(38, "keydown");
-		}
-		else if (result < 0.4) { // less than 0.4 [press down]
-			simulateKeyPress(40, "keydown");
-		}
-		else {
-			//do nothing
+function getBestNN(){
+	var maxFitness = -1;
+	var bestNNIndex;
+
+	for (var i = 0; i < gen.genomes.length; i++) {
+		if (gen.genomes[i].fitness > maxFitness) {
+			maxFitness = gen.genomes[i].fitness;
+			bestNNIndex = i;
 		}
 	}
-	else if (game == games.FLAPPY) {
-		// Make action depending the neural net output
-		if (result > 0.5) { // greater than 0.5 [press up]
-			runner.game.birds[0].flap();
-			//this.birds[0].flap()
-		}
-	}
+
+	printSelectedNeuralNet(bestNNIndex);
 }
 
-//
-function restartGame() {
-	//ctx.clearRect(0,0,c.width,c.height);
-
-	if (currentGameIndex == games.TREX) {
-		runner.restart();
-	}
-	else if (currentGameIndex == games.FLAPPY) {
-		runner.game.start();
-	}
+function printSelectedNeuralNet(nnIndex) {
+	var weights = gen.genomes[nnIndex].getWeights();
+	$("#textareaExport").html(weights.toString());
 }
 
+function resfreshNNselection() {
+	$("#neuralNetSelector").empty();
+	for (var i = 0; i < gen.genomes.length; i++) {
+		$("#neuralNetSelector").append('<option value="'+i+'">Neural net '+(i+1)+'</option>');
+	}
 
-/*
-
-*/
-
-
+	$('select').material_select();
+	printSelectedNeuralNet($('#neuralNetSelector').val());
+}
 
 // Update the interface
 function updateInterface() {
@@ -460,7 +376,7 @@ function readSingleFile(evt) {
 
 // Clear the modals
 function clearModals() {
-    $('.modal').find('input:text, input:password, select, textarea').val('');
+    $('.modal').find('input:text, input:password').val('');
     $('.modal').find('input:radio, input:checkbox').prop('checked', false);
 }
 
@@ -471,8 +387,28 @@ function saveChange(){
 
 // Import a neural network
 function importNeuralNetwork(){
-    $('#importModal').modal('close');
-    Materialize.toast('Neural network succesfully imported', 4000)
+	gen = new Generation(myGameManager.defaultTopology, myGameManager.defaultNumberOfGenomes, activation, selectionMethod, crossoverMethod, mutationMethod);
+
+	var genToImport = JSON.parse("[" + $("#textareaImport").val() + "]");
+	var oldGen = gen.genomes[0].getWeights();
+
+	if (genToImport.length != oldGen.length) {
+		Materialize.toast('Importation error, missing or too many data (wrong game ?)', 6000)
+	}
+	else {
+		gen.genomes[0].setWeights(genToImport);
+
+	    Materialize.toast('Neural network succesfully imported', 4000)
+
+	    // Reset everything
+		fitnessChart.data.datasets[0].data = null;
+	    timePassed = 0;
+	    $("#timeIndex").html(timePassed);
+		updateInterface()
+	    gen.drawNeuralNet(c,ctx);
+	}
+	
+	$('#importModal').modal('close');
 }
 
 // Transform a multidimensionnal array into an 1 dimension array
