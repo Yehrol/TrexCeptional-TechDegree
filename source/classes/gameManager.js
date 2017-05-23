@@ -98,7 +98,7 @@ class flappyManager extends gameManager {
 		super();
 		
 		this.defaultTopology = [2,2,1];
-		this.defaultNumberOfGenomes = 50;
+		this.defaultNumberOfGenomes = 60;
 		this.tmpFitness = 0;
 	}
 

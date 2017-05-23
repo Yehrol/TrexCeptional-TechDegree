@@ -11,7 +11,7 @@ class Connection {
 		// Create the initial weight
 		this.weight = this.randomWeight(-1,1);
 		
-		this.deltaWeight;
+		//this.deltaWeight;
 	}
 
 	getWeight() {

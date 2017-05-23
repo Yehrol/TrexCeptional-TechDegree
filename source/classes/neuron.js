@@ -26,11 +26,11 @@ class Neuron {
 		this.index = pIndex;
 
 		// 
-		this.gradient;
+		//this.gradient;
 
 		// 
-		this.eta = 0.15; // [0..1]
-		this.alpha = 0.5; // [0..n]
+		//this.eta = 0.15; // [0..1]
+		//this.alpha = 0.5; // [0..n]
 
 		// Store the activation function
 		this.activationFunction = pActivationFunction;
@@ -64,7 +64,7 @@ class Neuron {
 	}
 
 	//
-	calculateOutputGradients(targetValue) {
+	/*calculateOutputGradients(targetValue) {
 		var delta = targetValue - this.outputValue;
 		this.gradient = delta * this.activationFunction.derivative(this.outputValue);
 	}
@@ -99,5 +99,5 @@ class Neuron {
 			neuron.outputWeights[this.index].deltaWeight = newDeltaWeight;
 			neuron.outputWeights[this.index].weight += newDeltaWeight;
 		}
-	}
+	}*/
 }

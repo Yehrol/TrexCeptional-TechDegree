@@ -79,7 +79,7 @@ class NeuralNetwork {
 	}
 
 	// 
-	backPropagation(targetValues) {
+	/*backPropagation(targetValues) {
 		// Calculate overall net error (RMS)
 		var outputLayer = this.layers;
 		var error = 0;
@@ -121,7 +121,7 @@ class NeuralNetwork {
 		for (var neuronNum = 0; neuronNum < this.layers.length - this.layers.numberOfBias; neuronNum++) {
 			resultValues.push(this.layers[neuronNum].outputValue);
 		}
-	}
+	}*/
 
 	// Get the result of the output neuron
 	getOutput() {
