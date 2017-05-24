@@ -380,11 +380,6 @@ function clearModals() {
     $('.modal').find('input:radio, input:checkbox').prop('checked', false);
 }
 
-// Save the change on the neural network
-function saveChange(){
-    Materialize.toast('Neural network succesfully modified', 4000)
-}
-
 // Import a neural network
 function importNeuralNetwork(){
 	gen = new Generation(myGameManager.defaultTopology, myGameManager.defaultNumberOfGenomes, activation, selectionMethod, crossoverMethod, mutationMethod);
