@@ -10,7 +10,7 @@ var isRunning = false;
 
 var myGameManager;
 
-//
+// Associate a game to an index
 var games = {
 	TREX: 1,
 	FLAPPY: 2
@@ -129,7 +129,7 @@ $(document).ready(function(){
 	crossoverMethod = new singlePointCrossover();
 	mutationMethod = new mutationWithRate(0.2); // [0..1]
 
-    // Instanciate the game
+    // Check wich game should be instanciate
     if (currentGameIndex == games.TREX) {
     	$("select[name=gameSelector] option[value=1]").prop('selected', 'selected');
 
@@ -141,6 +141,7 @@ $(document).ready(function(){
     	myGameManager = new flappyManager();
     }
 
+    // Instanciate the game
     runner = myGameManager.instanciateGame();
 
 	// Create a new generation
@@ -152,7 +153,7 @@ $(document).ready(function(){
     // Resize the canvas depending the container size
     resizeNeuralNetCanvas();
 
-	// Event when the game is changed
+	// Print the value of the neural net on the "export" modals
 	$( "#neuralNetSelector" ).change(function() {
 		printSelectedNeuralNet($('#neuralNetSelector').val());
 	});
@@ -173,18 +174,24 @@ $(document).ready(function(){
 				myGameManager = new flappyManager();
 			}
 
+			// Instanciate the game
 			runner = myGameManager.instanciateGame();
 
+			//Create a new generation
 			gen = new Generation(myGameManager.defaultTopology, myGameManager.defaultNumberOfGenomes, activation, selectionMethod, crossoverMethod, mutationMethod);
+
 			// Draw the neural net
 			gen.drawNeuralNet(c,ctx);
+
+			// Reset the chart
 			fitnessChart.data.datasets[0].data = null;
 
+			//Change the running state
 			changeRunningState(false);
 		}
 	});
     
-    // 
+    // Timer for the application
 	setInterval(function(){
 		startAI();
 	}, 1000 / AIResfreshRate);
@@ -193,7 +200,6 @@ $(document).ready(function(){
 // Change the state of the AI
 function changeRunningState(state) {
 	if (typeof state == "undefined") {
-		// Change the state
 		isRunning = !isRunning;
 	}
 	else {
@@ -205,27 +211,26 @@ function changeRunningState(state) {
 		$("#stateBtn").html('STOP<i class="material-icons right">power_settings_new</i>');
 		Materialize.toast('AI Started', 4000);
 
+		// Unpause the game
 		myGameManager.play(runner);
 	}
 	else{
 		$("#stateBtn").html('START<i class="material-icons right">power_settings_new</i>');
 		Materialize.toast('AI Stopped', 4000);
 
+		// Pause the game
 		myGameManager.pause(runner);
 	}
 }
 
 // 
 function startAI() {
-    /*$('#Velocity').html(gameValue[0]);
-    $('#Distance').html(gameValue[1]);
-    $('#yPosition').html(gameValue[2]);
-    $('#Size').html(gameValue[3]);*/
-
 	// Check if the AI should "run"
 	if (isRunning == true) {
+		// Get the normalized data
 		var gameValue = myGameManager.getNormalizedInputValues(runner);
 
+		// Check if some value were found
 		if (gameValue.length > 0) {
 
 			// timer
@@ -236,7 +241,7 @@ function startAI() {
 				timer = 0;
 			}
 
-			// Neural net preview
+			// Neural net preview refresh
 			nnPreviewCounter++;
 			if (nnPreviewCounter >= (AIResfreshRate / nnPreviewRefreshRate)) {
 				// Draw the neural net
@@ -250,6 +255,7 @@ function startAI() {
 			// Make a game action
 			myGameManager.action(runner, result);
 
+			// Update the fitness of the AI
 			myGameManager.fitness(runner);
 			
 			// When the AI die
@@ -271,6 +277,7 @@ function startAI() {
 	}
 }
 
+// Get the best neural net index
 function getBestNN(){
 	var maxFitness = -1;
 	var bestNNIndex;
@@ -285,11 +292,13 @@ function getBestNN(){
 	printSelectedNeuralNet(bestNNIndex);
 }
 
+// Print the weights of a neural net
 function printSelectedNeuralNet(nnIndex) {
 	var weights = gen.genomes[nnIndex].getWeights();
 	$("#textareaExport").html(weights.toString());
 }
 
+// Refresh the neural net index selector (export modals)
 function resfreshNNselection() {
 	$("#neuralNetSelector").empty();
 	for (var i = 0; i < gen.genomes.length; i++) {

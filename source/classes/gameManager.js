@@ -69,6 +69,7 @@ class trexManager extends gameManager {
 			this.tmpFitness++;
 		}
 		this.lastXpos = game.horizon.obstacles[0].xPos;
+		log(this.tmpFitness);
 		//log(this.tmpFitness);
 	}
 
@@ -88,6 +89,8 @@ class trexManager extends gameManager {
 	}
 
 	restart(game) {
+		this.tmpFitness = 0;
+		this.lastXpos = 1000;
 		game.restart();
 	}
 }
@@ -97,7 +100,7 @@ class flappyManager extends gameManager {
 		// Parent constructor
 		super();
 		
-		this.defaultTopology = [2,2,1];
+		this.defaultTopology = [2,3,1];
 		this.defaultNumberOfGenomes = 60;
 		this.tmpFitness = 0;
 	}
