@@ -10,7 +10,7 @@ var isRunning = false;
 
 var myGameManager;
 
-// Associate a game to an index
+// Associates a game to an index
 var games = {
 	TREX: 1,
 	FLAPPY: 2
@@ -155,7 +155,8 @@ $(document).ready(function(){
 
 	// Print the value of the neural net on the "export" modals
 	$( "#neuralNetSelector" ).change(function() {
-		printSelectedNeuralNet($('#neuralNetSelector').val());
+		var nnIndex = $('#neuralNetSelector').val();
+		printSelectedNeuralNet(gen.genomes[nnIndex]);
 	});
 
 	// Event when the game is changed
@@ -184,7 +185,7 @@ $(document).ready(function(){
 			gen.drawNeuralNet(c,ctx);
 
 			// Reset the chart
-			fitnessChart.data.datasets[0].data = null;
+			removeData(fitnessChart);
 
 			//Change the running state
 			changeRunningState(false);
@@ -261,20 +262,28 @@ function startAI() {
 			// When the AI die
 			if (myGameManager.isDead(runner)) {
 				// Restart the game
+				var fitness = myGameManager.tmpFitness;
 				myGameManager.restart(runner);
 
-				// Change the generation and save the fitness
-				gen.nextGen(myGameManager.tmpFitness, fitnessChart);
+				// Check if the game has restarted before changing generation
+				if (!myGameManager.isDead(runner)) {
+					// Change the generation and save the fitness
+					gen.nextGen(fitness, fitnessChart);
 
-				// Reset the value (counting obstacle)
-				fitness = 0;
-				lastValue = 1000
-
-				// Update the interface
-				updateInterface();
+					// Update the interface
+					updateInterface();
+				}
 			}
 		}
 	}
+}
+
+function removeData(chart) {
+    chart.data.labels.pop();
+    chart.data.datasets.forEach((dataset) => {
+        dataset.data.pop();
+    });
+    chart.update();
 }
 
 // Get the best neural net index
@@ -289,12 +298,12 @@ function getBestNN(){
 		}
 	}
 
-	printSelectedNeuralNet(bestNNIndex);
+	printSelectedNeuralNet(gen.genomes[bestNNIndex]);
 }
 
 // Print the weights of a neural net
-function printSelectedNeuralNet(nnIndex) {
-	var weights = gen.genomes[nnIndex].getWeights();
+function printSelectedNeuralNet(bestGenome) {
+	var weights = bestGenome.getWeights();
 	$("#textareaExport").html(weights.toString());
 }
 
@@ -306,7 +315,9 @@ function resfreshNNselection() {
 	}
 
 	$('select').material_select();
-	printSelectedNeuralNet($('#neuralNetSelector').val());
+
+	var nnIndex = $('#neuralNetSelector').val();
+	printSelectedNeuralNet(gen.genomes[nnIndex]);
 }
 
 // Update the interface
@@ -328,8 +339,8 @@ function resizeNeuralNetCanvas() {
 function addDataToChart(chart,fitness) {
 	var chartLength = chart.data.datasets[0].data.length;
 
-	chart.data.datasets[0].data[chartLength] = fitness;
-	chart.data.labels[chartLength] = "Gen " + (chartLength + 1);
+	chart.data.datasets[0].data.push(fitness);
+	chart.data.labels.push("Gen " + (chartLength + 1));
 	chart.update();
 }
 
@@ -405,8 +416,8 @@ function importNeuralNetwork(){
 	    Materialize.toast('Neural network succesfully imported', 4000)
 
 	    // Reset everything
+	    removeData(fitnessChart);
 	    myGameManager.restart(runner);
-		fitnessChart.data.datasets[0].data = null;
 	    timePassed = 0;
 	    $("#timeIndex").html(timePassed);
 		updateInterface()
@@ -419,8 +430,6 @@ function importNeuralNetwork(){
 // Transform a multidimensionnal array into an 1 dimension array
 function ravel(array) {
 	var result = new Array();
-	//log(typeof array[0]);
-	//log(array[0]);
 	if (typeof array[0] == "undefined" || typeof array[0] == "number") {//TO CHANGE
 		result = array;
 	}
@@ -435,7 +444,7 @@ function ravel(array) {
 	return result;
 }
 
-// For debug (faster)
+// For debug (faster to type)
 function log(msg) {
 	console.log(msg);
 }

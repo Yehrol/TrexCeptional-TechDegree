@@ -16,7 +16,9 @@ class Generation {
 		}
 		this.generation = 0;
 		this.currentGenome = 0;
-		//this.rate = pRate;
+
+		// Store the power for the fitness
+		this.power = 4;
 
 		// Set the different method used to create a new generation
 		this.selection = pSelectionMethod;
@@ -26,6 +28,8 @@ class Generation {
 		// Forced to store them to create a new object from the object himself
 		this.topology = pTopology;
 		this.activationFunction = pActivationFunction;
+
+		this.bestNeuralNet = new Genome(pTopology, pActivationFunction);
 
 		// Create the new generation
 		for (var i = 0; i < this.numberOfGenomes; i++) {
@@ -47,7 +51,7 @@ class Generation {
 	//
 	nextGen(pFitness, pFitnessChart) {
 		// Store the score of the current genome
-		this.genomes[this.currentGenome].setFitness(pFitness);
+		this.genomes[this.currentGenome].setFitness(pFitness**this.power);
 
 		// Change the generation if we used all the genomes
 		if (this.currentGenome >= this.genomes.length - 1) {
@@ -62,15 +66,17 @@ class Generation {
 
 			// Create a new generation
 			var selected = this.selection.process(this);
-			//log(selected);
 			var newGen = this.crossover.process(this,selected);
-			//log(newGen);
 			var newMutatedGen = this.mutation.process(newGen);
 			this.genomes = newMutatedGen;
-			//log("-----------------------");
 		}
 		else {
 			this.currentGenome++;
+		}
+
+		// Get the best neural net ever made
+		if (this.bestNeuralNet.fitness < pFitness**this.power) {
+			this.bestNeuralNet = this.genomes[this.currentGenome];
 		}
 	}
 
@@ -83,7 +89,7 @@ class Generation {
 		}
 		fitnessAverage /= this.genomes.length;
 
-		return fitnessAverage;
+		return Math.pow(fitnessAverage,1/this.power);
 	}
 
 	getBestFitness() {
@@ -94,7 +100,7 @@ class Generation {
 			}
 		}
 
-		return bestFitness;
+		return Math.pow(bestFitness,1/this.power);
 	}
 
 	drawNeuralNet(canvas,context) {
