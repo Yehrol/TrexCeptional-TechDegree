@@ -18,7 +18,7 @@ class Generation {
 		this.currentGenome = 0;
 
 		// Store the power for the fitness
-		this.power = 4;
+		this.power = 1;
 
 		// Set the different method used to create a new generation
 		this.selection = pSelectionMethod;
@@ -69,6 +69,7 @@ class Generation {
 			var newGen = this.crossover.process(this,selected);
 			var newMutatedGen = this.mutation.process(newGen);
 			this.genomes = newMutatedGen;
+			//this.mutation.rate = 
 		}
 		else {
 			this.currentGenome++;
