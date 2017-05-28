@@ -21,7 +21,7 @@ class trexManager extends gameManager {
 		// Parent constructor
 		super();
 
-		this.defaultTopology = [1,1,1]; //4,4,1
+		this.defaultTopology = [2,2,1]; //4,4,1
 		this.defaultNumberOfGenomes = 12;
 		this.tmpFitness = 0;
 		this.lastXpos = 1000;
@@ -45,7 +45,7 @@ class trexManager extends gameManager {
 		    var normalizedYPosition = game.horizon.obstacles[0].yPos / maxYPosition;
 		    var normalizedSize = game.horizon.obstacles[0].size / maxSize;
 
-		    inputs = [normalizedDistance];//,normalizedVelocity,normalizedSize,normalizedYPosition
+		    inputs = [normalizedDistance,normalizedYPosition];//,normalizedVelocity,normalizedSize
 		}
 
 		return inputs;

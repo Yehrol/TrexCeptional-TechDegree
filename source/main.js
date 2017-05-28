@@ -21,8 +21,8 @@ var selectionMethod;
 var crossoverMethod;
 var mutationMethod;
 
-// Store the current game index (1 is the trex game)
-var currentGameIndex = games.FLAPPY;
+// Store the current game index
+var currentGameIndex = games.TREX;
 
 // Game variable
 var runner;
