@@ -53,6 +53,11 @@ class Generation {
 		// Store the score of the current genome
 		this.genomes[this.currentGenome].setFitness(pFitness**this.power);
 
+		// Get the best neural net ever made
+		if (this.bestNeuralNet.fitness < pFitness**this.power) {
+			this.bestNeuralNet = this.genomes[this.currentGenome];
+		}
+
 		// Change the generation if we used all the genomes
 		if (this.currentGenome >= this.genomes.length - 1) {
 			// Reset the current genome number
@@ -73,11 +78,6 @@ class Generation {
 		}
 		else {
 			this.currentGenome++;
-		}
-
-		// Get the best neural net ever made
-		if (this.bestNeuralNet.fitness < pFitness**this.power) {
-			this.bestNeuralNet = this.genomes[this.currentGenome];
 		}
 	}
 
