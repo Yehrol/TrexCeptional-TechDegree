@@ -1,12 +1,18 @@
 /***********************************************************
 * Author : De Biasi Loris
-* Description : 
+* Description : The neural network class
 * Version : 0.1
 * Date : 24.04.2017
 ***********************************************************/
 
+/** Class used to instanciate a neural network */
 class NeuralNetwork {
-	// Constructor
+	/**
+	 * Create a neural network.
+ 	 * @constructor
+	 * @param {number} pTopology - The topology of the neural network
+	 * @param {activationFunction} pActivationFunction - The activation function
+	 */
 	constructor(pTopology, pActivationFunction) {
 		// Store the number of layer
 		this.numberOfLayers = pTopology.length;
@@ -31,7 +37,10 @@ class NeuralNetwork {
 		this.layers[this.layers.length - 1].neurons[this.layers[this.layers.length - 1].neurons.length - 1].outputValue = 1;
 	}
 
-	// 
+	/**
+	 * Feed forward the values
+	 * @param {number} inputValues - The input values
+	 */
 	feedForward(inputValues) {
 		// Assign the input values into the input neurons
 		for (var i = 0; i < inputValues.length; i++) {
@@ -50,6 +59,10 @@ class NeuralNetwork {
 		}
 	}
 
+	/**
+	 * Get the weights of this neural network
+	 * @return {number} The weights of the neural network.
+	 */
 	getWeights() {
 		var weights = [];
 		for (var i = 0; i < this.layers.length; i++) {
@@ -58,6 +71,9 @@ class NeuralNetwork {
 		return ravel(weights);
 	}
 
+	/**
+	 * Set the weights of this neural network
+	 */
 	setWeights(pWeights) {
 		var pos = 0;
 		for (var i = 0; i < this.numberOfLayers; i++) {
@@ -78,56 +94,17 @@ class NeuralNetwork {
 		}
 	}
 
-	// 
-	/*backPropagation(targetValues) {
-		// Calculate overall net error (RMS)
-		var outputLayer = this.layers;
-		var error = 0;
-
-		//
-		for (var neuronNum = 0; neuronNum < outputLayer.length - outputLayer.numberOfBias; neuronNum++) {
-			var delta = targetValues[neuronNum] - outputLayer[neuronNum].outputValue;
-			error += delta * delta;
-		}
-
-		// Get the average error
-		error /= outputLayer.length - 1;
-
-		// RMS
-		error = Math.sqrt(error);
-
-		// Calculate output layer gradients
-		for (var neuronNum = 0; neuronNum < outputLayer.length - outputLayer.numberOfBias; neuronNum++) {
-			outputLayer[neuronNum].calculateOutputGradients(targetValues[neuronNum]);
-		}
-
-		// calculate gradients on hidden layers
-		for (var layerNum = this.layers.length; layerNum > 0; layerNum--) {// - this.layers.numberOfBias
-			var currentLayer = this.layers[layerNum];
-			var previousLayer = this.layers[layerNum - 1];
-
-			for (var neuronNum = 0; neuronNum < this.layers.length - 1; ni++) {
-				currentLayer[neuronNum].updateInputWeights(previousLayer);
-			}
-		}
-
-		// For all layers output to first hidden layer, update connection weights
-	}
-
-	// 
-	getResults(resultValues) {
-		resultValues = [];
-
-		for (var neuronNum = 0; neuronNum < this.layers.length - this.layers.numberOfBias; neuronNum++) {
-			resultValues.push(this.layers[neuronNum].outputValue);
-		}
-	}*/
-
-	// Get the result of the output neuron
+	/**
+	 * Get the result of the output neuron
+	 * @return {number} The output value.
+	 */
 	getOutput() {
 		return this.layers[this.layers.length - 1].neurons[0].outputValue;
 	}
 
+	/**
+	 * Draw the neural network
+	 */
 	drawNeuralNet(canvas,context) {
 		// The size in pixel for a neuron
 		var neuronSize = 0;
@@ -230,4 +207,49 @@ class NeuralNetwork {
 			}
 		}
 	}
+
+	// 
+	/*backPropagation(targetValues) {
+		// Calculate overall net error (RMS)
+		var outputLayer = this.layers;
+		var error = 0;
+
+		//
+		for (var neuronNum = 0; neuronNum < outputLayer.length - outputLayer.numberOfBias; neuronNum++) {
+			var delta = targetValues[neuronNum] - outputLayer[neuronNum].outputValue;
+			error += delta * delta;
+		}
+
+		// Get the average error
+		error /= outputLayer.length - 1;
+
+		// RMS
+		error = Math.sqrt(error);
+
+		// Calculate output layer gradients
+		for (var neuronNum = 0; neuronNum < outputLayer.length - outputLayer.numberOfBias; neuronNum++) {
+			outputLayer[neuronNum].calculateOutputGradients(targetValues[neuronNum]);
+		}
+
+		// calculate gradients on hidden layers
+		for (var layerNum = this.layers.length; layerNum > 0; layerNum--) {// - this.layers.numberOfBias
+			var currentLayer = this.layers[layerNum];
+			var previousLayer = this.layers[layerNum - 1];
+
+			for (var neuronNum = 0; neuronNum < this.layers.length - 1; ni++) {
+				currentLayer[neuronNum].updateInputWeights(previousLayer);
+			}
+		}
+
+		// For all layers output to first hidden layer, update connection weights
+	}
+
+	// 
+	getResults(resultValues) {
+		resultValues = [];
+
+		for (var neuronNum = 0; neuronNum < this.layers.length - this.layers.numberOfBias; neuronNum++) {
+			resultValues.push(this.layers[neuronNum].outputValue);
+		}
+	}*/
 }

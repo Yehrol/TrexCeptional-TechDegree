@@ -1,13 +1,12 @@
 /***********************************************************
 * Author : De Biasi Loris
-* Description : 
+* Description : The mutation method class
 * Version : 0.1
 * Date : 16.06.2017
 ***********************************************************/
 
-// Abstract class for mutation method
+/** Abstract class for mutation method */
 class mutation {
-	//
 	constructor() {
 		if (new.target === mutation) {
 			throw new TypeError("Cannot construct mutation instances directly");
@@ -17,13 +16,21 @@ class mutation {
 	process(pNextGenomes) { throw new Error("Must override method"); }
 }
 
-// Mutation class without rate
+/**
+ * Mutation class without rate
+ * @extends mutation
+ */
 class mutationWithoutRate extends mutation {
 	constructor() {
 		// Parent constructor
 		super();
 	}
 
+	/**
+	 * Process the mutation method
+     * @param {number} pNextGenomes - A bunch of genomes.
+     * @return {genomes} The modified genomes.
+	 */
 	process(pNextGenomes) {
 		var weights = [];
 
@@ -73,7 +80,10 @@ class mutationWithoutRate extends mutation {
 	}
 }
 
-// Mutation class with rate
+/**
+ * Mutation class with rate
+ * @extends mutation
+ */
 class mutationWithRate extends mutation{
 	constructor(pMutationRate) {
 		// Parent constructor
@@ -82,6 +92,11 @@ class mutationWithRate extends mutation{
 		this.rate = pMutationRate;
 	}
 
+	/**
+	 * Process the mutation method
+     * @param {number} pNextGenomes - A bunch of genomes.
+     * @return {genomes} The modified genomes.
+	 */
 	process(pNextGenomes) {
 		var weights = [];
 

@@ -1,6 +1,6 @@
 /***********************************************************
 * Author : De Biasi Loris
-* Description : 
+* Description : The main script of the application
 * Version : 0.1
 * Date : 24.04.2017
 ***********************************************************/
@@ -278,6 +278,7 @@ function startAI() {
 	}
 }
 
+//
 function removeData(chart) {
     chart.data.labels.pop();
     chart.data.datasets.forEach((dataset) => {

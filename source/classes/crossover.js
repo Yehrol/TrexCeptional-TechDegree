@@ -1,13 +1,12 @@
 /***********************************************************
 * Author : De Biasi Loris
-* Description : 
+* Description : The crossover method class
 * Version : 0.1
 * Date : 16.06.2017
 ***********************************************************/
 
-// Abstract class for crossover method
+/** Abstract class for crossover method */
 class crossover {
-	//
 	constructor() {
 		if (new.target === crossover) {
 			throw new TypeError("Cannot construct crossover instances directly");
@@ -17,13 +16,22 @@ class crossover {
 	process(pGeneration,pSelectedGenomes) { throw new Error("Must override method"); }
 }
 
-// Single point crossover method
+/**
+ * Single point crossover method
+ * @extends crossover
+ */
 class singlePointCrossover extends crossover {
 	constructor() {
 		// Parent constructor
 		super();
 	}
 
+	/**
+	 * Process the crossover method
+     * @param {number} pGeneration - The generation.
+     * @param {number} pSelectedGenomes - The selected genomes.
+     * @return {genomes} The modified genomes.
+	 */
 	process(pGeneration,pSelectedGenomes) {
 		var children = [];
 		// Create a copy of the genomes
@@ -82,23 +90,43 @@ class singlePointCrossover extends crossover {
 	}
 }
 
+/**
+ * not implemented yet
+ * @extends crossover
+ */
 class twoPointCrossover extends crossover{
 	constructor() {
 		// Parent constructor
 		super();
 	}
 
+	/**
+	 * Process the crossover method
+     * @param {number} pGeneration - The generation.
+     * @param {number} pSelectedGenomes - The selected genomes.
+     * @return {genomes} The modified genomes.
+	 */
 	process(pGeneration,pSelectedGenomes) {
 		
 	}
 }
 
+/**
+ * not implemented yet
+ * @extends crossover
+ */
 class uniformCrossover extends crossover{
 	constructor() {
 		// Parent constructor
 		super();
 	}
 	
+	/**
+	 * Process the crossover method
+     * @param {number} pGeneration - The generation.
+     * @param {number} pSelectedGenomes - The selected genomes.
+     * @return {genomes} The modified genomes.
+	 */
 	process(pGeneration,pSelectedGenomes) {
 		
 	}

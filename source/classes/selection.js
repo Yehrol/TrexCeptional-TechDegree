@@ -1,13 +1,12 @@
 /***********************************************************
 * Author : De Biasi Loris
-* Description : 
+* Description : The selection method class
 * Version : 0.1
 * Date : 16.06.2017
 ***********************************************************/
 
-// Abstract class for selection method
+/** Abstract class for selection method */
 class selection {
-	//
 	constructor() {
 		if (new.target === selection) {
 			throw new TypeError("Cannot construct selection instances directly");
@@ -17,13 +16,21 @@ class selection {
 	process(pGeneration) { throw new Error("Must override method"); }
 }
 
-// NOT USED AND MUST BE CHANGED
+/**
+ * NOT USED AND MUST BE CHANGED
+ * @extends selection
+ */
 class selectionOfBest extends selection {
 	constructor() {
 		// Parent constructor
 		super();
 	}
 
+	/**
+	 * Process the selection method
+     * @param {number} pGeneration - The generation.
+     * @return {number} The selected parents.
+	 */
 	process(pGeneration) {
 		// Store the best genome
 		var selected = [];
@@ -64,28 +71,33 @@ class selectionOfBest extends selection {
 					// Store the best genome
 					genomeToAppend = genClone.genomes[j];
 					indexToRemove = j;
-					//log(indexToRemove);
 				}
 			}
-			//log(arrayClone);
 			selected.push(genomeToAppend);
 
 			// Remove the genome from the copied array
-			//log(indexToRemove);
 			genClone.genomes.splice(indexToRemove, 1);
-			//log(genClone.genomes);
 		}
 
 		return selected;
 	}
 }
 
+/**
+ * Roulette wheel selection method
+ * @extends selection
+ */
 class rouletteWheelSelection extends selection{
 	constructor() {
 		// Parent constructor
 		super();
 	}
 
+	/**
+	 * Process the selection method
+     * @param {number} pGeneration - The generation.
+     * @return {number} The selected parents.
+	 */
 	process(pGeneration) {
 		var selected = [];
 		var numberOfWantedParents = 2;//2*Math.floor(Math.sqrt(pGeneration.genomes.length)/2)

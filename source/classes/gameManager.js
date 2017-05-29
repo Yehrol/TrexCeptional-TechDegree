@@ -1,5 +1,13 @@
+/***********************************************************
+* Author : De Biasi Loris
+* Description : The game manager class. Allows to add
+*			    games easily
+* Version : 0.1
+* Date : 22.05.2017
+***********************************************************/
+
+/** Abstract class for game manager */
 class gameManager {
-	//
 	constructor() {
 		if (new.target === gameManager) {
 			throw new TypeError("Cannot construct gameManager instances directly");
@@ -16,7 +24,15 @@ class gameManager {
 	restart(game) { throw new Error("Must override method"); }
 }
 
+/**
+ * Trex game manager
+ * @extends gameManager
+ */
 class trexManager extends gameManager {
+	/**
+	 * Create a trex manager.
+ 	 * @constructor
+	 */
 	constructor() {
 		// Parent constructor
 		super();
@@ -27,10 +43,19 @@ class trexManager extends gameManager {
 		this.lastXpos = 1000;
 	}
 
+	/**
+	 * Create a trex manager.
+	 * @return {game} The game
+	 */
 	instanciateGame() {
 		return new Runner('.interstitial-wrapper');
 	}
 
+	/**
+	 * Get the normalized input values
+     * @param {game} game - The game
+	 * @return {number} The input
+	 */
 	getNormalizedInputValues(game) {
 		var inputs = [];
 
@@ -51,6 +76,11 @@ class trexManager extends gameManager {
 		return inputs;
 	}
 
+	/**
+	 * Make an action depending the result
+     * @param {game} game - The game
+     * @param {game} result - The result
+	 */
 	action(game, result) {
 		// Make action depending the neural net output
 		if (result > 0.6) { // greater than 0.6 [press up]
@@ -64,6 +94,10 @@ class trexManager extends gameManager {
 		}
 	}
 
+	/**
+	 * Update the fitness
+     * @param {game} game - The game
+	 */
 	fitness(game) {
 		if (game.horizon.obstacles[0].xPos > this.lastXpos) {
 			this.tmpFitness++;
@@ -71,10 +105,19 @@ class trexManager extends gameManager {
 		this.lastXpos = game.horizon.obstacles[0].xPos;
 	}
 
+	/**
+	 * Check if the player is dead
+     * @param {game} game - The game
+	 * @return {boolean} The status of the game
+	 */
 	isDead(game) {
 		return game.crashed;
 	}
 
+	/**
+	 * Unpause the game
+     * @param {game} game - The game
+	 */
 	play(game) {
 		// Unpause the trex game
 		game.play();
@@ -82,10 +125,18 @@ class trexManager extends gameManager {
 		simulateKeyPress(38, "keydown");
 	}
 
+	/**
+	 * Pause the game
+     * @param {game} game - The game
+	 */
 	pause(game) {
 		game.stop();
 	}
 
+	/**
+	 * Restart the game
+     * @param {game} game - The game
+	 */
 	restart(game) {
 		this.tmpFitness = 0;
 		this.lastXpos = 1000;
@@ -93,7 +144,15 @@ class trexManager extends gameManager {
 	}
 }
 
+/**
+ * Flappy game manager
+ * @extends gameManager
+ */
 class flappyManager extends gameManager {
+	/**
+	 * Create a flappy manager.
+ 	 * @constructor
+	 */
 	constructor() {
 		// Parent constructor
 		super();
@@ -103,10 +162,19 @@ class flappyManager extends gameManager {
 		this.tmpFitness = 0;
 	}
 
+	/**
+	 * Create a trex manager.
+	 * @return {game} The game
+	 */
 	instanciateGame() {
 		return new flappyBird();
 	}
 
+	/**
+	 * Get the normalized input values
+     * @param {game} game - The game
+	 * @return {number} The input
+	 */
 	getNormalizedInputValues(game) {
 		var inputs = [];
 
@@ -133,6 +201,11 @@ class flappyManager extends gameManager {
 		return inputs;
 	}
 
+	/**
+	 * Make an action depending the result
+     * @param {game} game - The game
+     * @param {game} result - The result
+	 */
 	action(game, result) {
 		// Make action depending the neural net output
 		if (result > 0.5) { // greater than 0.5 [press up]
@@ -140,22 +213,43 @@ class flappyManager extends gameManager {
 		}
 	}
 
+	/**
+	 * Update the fitness
+     * @param {game} game - The game
+	 */
 	fitness(game) {
 		this.tmpFitness = game.game.score;
 	}
 
+	/**
+	 * Check if the player is dead
+     * @param {game} game - The game
+	 * @return {boolean} The status of the game
+	 */
 	isDead(game) {
 		return game.game.isItEnd();
 	}
 
+	/**
+	 * Unpause the game
+     * @param {game} game - The game
+	 */
 	play(game) {
 		game.game.run = true;
 	}
 
+	/**
+	 * Pause the game
+     * @param {game} game - The game
+	 */
 	pause(game) {
 		game.game.run = false;
 	}
 
+	/**
+	 * Restart the game
+     * @param {game} game - The game
+	 */
 	restart(game) {
 		this.tmpFitness = 0;
 		game.game.start();

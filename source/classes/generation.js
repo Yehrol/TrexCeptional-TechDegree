@@ -1,11 +1,22 @@
 /***********************************************************
 * Author : De Biasi Loris
-* Description : 
+* Description : The generation class.
 * Version : 0.1
 * Date : 24.04.2017
 ***********************************************************/
 
+/** Class used to create a generation. */
 class Generation {
+	/**
+	 * Create a generation.
+ 	 * @constructor
+	 * @param {number} pTopology - The topology of the neural network
+	 * @param {number} pNbOfGenome - The number of genomes
+	 * @param {activationFunction} pActivationFunction - The activation function
+	 * @param {selectionMethod} pSelectionMethod - The selection method
+	 * @param {crossoverMethod} pCrossoverMethod - The crossover method
+	 * @param {mutationMethod} pMutationMethod - The mutation method
+	 */
 	constructor(pTopology, pNbOfGenome, pActivationFunction, pSelectionMethod, pCrossoverMethod, pMutationMethod) {
 		this.genomes = [];
 		if (pNbOfGenome < 4) {
@@ -37,7 +48,11 @@ class Generation {
 		}
 	}
 
-	//
+	/**
+     * Run the current generation and return the output value
+	 * @param {number} input - The input values
+     * @return {number} the output value.
+     */
 	run(input) {
 		// Feed the neural network with the value
     	this.genomes[this.currentGenome].feedForward(input);
@@ -48,7 +63,11 @@ class Generation {
 		return result;
 	}
 
-	//
+	/**
+     * Create the next generation
+	 * @param {number} pFitness - The fitness
+	 * @param {chart} pFitnessChart - The fitness chart
+     */
 	nextGen(pFitness, pFitnessChart) {
 		// Store the score of the current genome
 		this.genomes[this.currentGenome].setFitness(pFitness**this.power);
@@ -81,9 +100,10 @@ class Generation {
 		}
 	}
 
-	//
+	/**
+     * Get the fitness average of the generation
+     */
 	getFitnessAverage() {
-		// Get the fitness average of the generation
 		var fitnessAverage = 0;
 		for (var i = 0; i < this.genomes.length; i++) {
 			fitnessAverage += this.genomes[i].fitness;
@@ -93,6 +113,9 @@ class Generation {
 		return Math.pow(fitnessAverage,1/this.power);
 	}
 
+	/**
+     * Get the best fitness of the generation
+     */
 	getBestFitness() {
 		var bestFitness = 0;
 		for (var i = 0; i < this.genomes.length; i++) {
@@ -103,7 +126,12 @@ class Generation {
 
 		return Math.pow(bestFitness,1/this.power);
 	}
-
+ 
+	/**
+	 * Draw the neural network
+	 * @param {canvas} canvas - The canvas
+	 * @param {context} context - The context of the canvas
+	 */
 	drawNeuralNet(canvas,context) {
 		this.genomes[this.currentGenome].drawNeuralNet(canvas,context);
 	}

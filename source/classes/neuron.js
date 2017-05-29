@@ -1,12 +1,19 @@
 /***********************************************************
 * Author : De Biasi Loris
-* Description : 
+* Description : The neuron class
 * Version : 0.1
 * Date : 24.04.2017
 ***********************************************************/
 
+/** Class used to create a neuron for a neural network */
 class Neuron {
-	// Constructor
+	/**
+	 * Create a neuron.
+ 	 * @constructor
+	 * @param {number} pNumberOfOutputs - The number of outputs
+	 * @param {number} pIndex - The index of this neuron
+	 * @param {activationFunction} pActivationFunction - The activation function
+	 */
 	constructor(pNumberOfOutputs, pIndex, pActivationFunction) {
 		// Store the number of output
 		this.numberOfOutputs = pNumberOfOutputs;
@@ -22,13 +29,13 @@ class Neuron {
 			this.outputWeights.push(new Connection());
 		}
 
-		// 
+		// Store the index of this neuron
 		this.index = pIndex;
 
 		// 
 		//this.gradient;
 
-		// 
+		// hyperparameter
 		//this.eta = 0.15; // [0..1]
 		//this.alpha = 0.5; // [0..n]
 
@@ -36,22 +43,32 @@ class Neuron {
 		this.activationFunction = pActivationFunction;
 	}
 
+	/**
+	 * Get the weights of this neuron
+	 * @return {number} The weigthts of this neuron.
+	 */
 	getWeights() {
-		//log(this.outputWeights);
 		var weights = [];
 		for (var i = 0; i < this.outputWeights.length; i++) {
 			weights.push(this.outputWeights[i].getWeight());
 		}
-		return ravel(weights); //weights
+		return ravel(weights);
 	}
 
+	/**
+	 * Set the weights of this neuron
+	 * @param {number} pWeights - The weights to set
+	 */
 	setWeights(pWeights) {
 		for (var c = 0; c < this.numberOfOutputs; c++) {
 			this.outputWeights[c].setWeight(pWeights[c]);
 		}
 	}
 
-	//
+	/**
+	 * Feed forward the values
+	 * @param {number} previousLayer - The previous layer
+	 */
 	feedForward(previousLayer) {
 		var sum = 0;
 		
