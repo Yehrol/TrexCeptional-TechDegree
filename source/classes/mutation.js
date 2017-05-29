@@ -5,6 +5,7 @@
 * Date : 16.06.2017
 ***********************************************************/
 
+// Abstract class for mutation method
 class mutation {
 	//
 	constructor() {
@@ -16,6 +17,7 @@ class mutation {
 	process(pNextGenomes) { throw new Error("Must override method"); }
 }
 
+// Mutation class without rate
 class mutationWithoutRate extends mutation {
 	constructor() {
 		// Parent constructor
@@ -60,7 +62,7 @@ class mutationWithoutRate extends mutation {
 
 			// Change the weights randomly
 			for (var i = 0; i < indexArray.length; i++) {
-				weights[genIndex][indexArray[i]] += Math.random() - 0.5;
+				weights[genIndex][indexArray[i]] += Math.random() * 0.4 - 0.2; // [-0.2...0.2]
 			}
 
 			// Apply the changes
@@ -71,6 +73,7 @@ class mutationWithoutRate extends mutation {
 	}
 }
 
+// Mutation class with rate
 class mutationWithRate extends mutation{
 	constructor(pMutationRate) {
 		// Parent constructor
@@ -86,9 +89,6 @@ class mutationWithRate extends mutation{
 		for (var g = 0; g < pNextGenomes.length; g++) {
 			weights.push(pNextGenomes[g].getWeights());
 		}
-
-		// Number of values that will change
-		var nbValuesToChange;
 
 		// Apply random mutation to each genomes
 		for (var genIndex = 0; genIndex < weights.length; genIndex++) {

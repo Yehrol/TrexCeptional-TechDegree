@@ -5,6 +5,7 @@
 * Date : 24.04.2017
 ***********************************************************/
 
+// Abstract class for activation function
 class activationFunction {
 	//
 	constructor() {
@@ -17,6 +18,7 @@ class activationFunction {
 	derivative(x) { throw new Error("Must override method"); }
 }
 
+// Sigmoid activation function class
 class sigmoid extends activationFunction {
 	constructor() {
 		// Parent constructor
@@ -32,6 +34,7 @@ class sigmoid extends activationFunction {
 	}
 }
 
+// Tanh activation function class
 class tanh extends activationFunction{
 	constructor() {
 		// Parent constructor

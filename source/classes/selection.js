@@ -5,6 +5,7 @@
 * Date : 16.06.2017
 ***********************************************************/
 
+// Abstract class for selection method
 class selection {
 	//
 	constructor() {

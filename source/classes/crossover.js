@@ -5,6 +5,7 @@
 * Date : 16.06.2017
 ***********************************************************/
 
+// Abstract class for crossover method
 class crossover {
 	//
 	constructor() {
@@ -16,6 +17,7 @@ class crossover {
 	process(pGeneration,pSelectedGenomes) { throw new Error("Must override method"); }
 }
 
+// Single point crossover method
 class singlePointCrossover extends crossover {
 	constructor() {
 		// Parent constructor
