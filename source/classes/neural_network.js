@@ -170,18 +170,17 @@ class NeuralNetwork {
 				context.stroke();
 				context.closePath();
 
-				// Draw the output values of each neuron
 				context.font = "20px Arial";
-				//log(this.layers[y].neurons[x]);
 
+				// Draw the output values of each neuron
 				context.fillText(this.layers[y].neurons[x].outputValue.toFixed(3),posY - (context.measureText(this.layers[y].neurons[x].outputValue.toFixed(3)).width / 2), posX + 10);
 
-				// Draw the line
+				// Check if this layer is the last one
 				if (y + 1 < this.layers.length) {
 					var nextSpaceBetweenNeuronX = (canvas.height - (this.layers[y+1].neurons.length * neuronSize)) / (this.layers[y+1].neurons.length + 1);
 					for (var neuronIndex = 0; neuronIndex < this.layers[y+1].neurons.length - 1; neuronIndex++) {
 
-						// Draw the line
+						// Get the line position
 						var linePosY = posY + neuronSize / 2;
 						var nextPosY = spaceBetweenNeuronY * (y+1) + spaceFromBorder;
 						var nextPosX = nextSpaceBetweenNeuronX * (neuronIndex+1) + neuronSize * neuronIndex + neuronSize / 2;
@@ -199,11 +198,10 @@ class NeuralNetwork {
 						// Change the font
 						context.font = "12px Arial";
 
-						// Rect behind the text
+						// Draw a rectangle behind the text
 						context.fillStyle="#FFFFFF";
 						context.fillRect(linePosY - yPourcent - 2, posX - xPourcent - 11, 38, 13);
 
-						// Draw the weight
 						context.fillStyle="#000000";
 
 						// Draw the weight of each neuron
