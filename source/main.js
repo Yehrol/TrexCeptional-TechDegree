@@ -187,6 +187,9 @@ $(document).ready(function(){
 			// Reset the chart
 			removeData(fitnessChart);
 
+			// Reset the timer
+			timePassed = 0;
+
 			//Change the running state
 			changeRunningState(false);
 		}
@@ -278,12 +281,10 @@ function startAI() {
 	}
 }
 
-//
+// Remove all the data in a chart
 function removeData(chart) {
-    chart.data.labels.pop();
-    chart.data.datasets.forEach((dataset) => {
-        dataset.data.pop();
-    });
+    chart.data.datasets[0].data = null;
+    chart.data.labels = [];
     chart.update();
 }
 
