@@ -80,16 +80,22 @@ class NeuralNetwork {
 			var nextLayerLength = 1;
 			var nbBias = this.layers[i].numberOfBias;
 
-			// If this is the last layer
-			if (typeof this.layers[i+1] != "undefined") {
+			// If this isn't the last layer
+			if (i+1 < this.layers.length) {//typeof this.layers[i+1] != "undefined"
 				nbBias = this.layers[i+1].numberOfBias;
 				nextLayerLength = this.layers[i+1].neurons.length;
 			}
 			
+			//Remove the number of bias from the next layer size
 			nextLayerLength -= nbBias;
 
+			//Get the number of neurons in this layer
 			var nbOfNeuronsInLayer = (this.layers[i].neurons.length) * nextLayerLength;
+
+			//Slice the array and send the right piece at the right layer
 			this.layers[i].setWeights(pWeights.slice(pos, pos + nbOfNeuronsInLayer), nextLayerLength);
+
+			//Increment the pos
 			pos+=nbOfNeuronsInLayer;
 		}
 	}
