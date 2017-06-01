@@ -346,17 +346,6 @@ function addDataToChart(chart,fitness) {
 	chart.update();
 }
 
-
-// Simulate a key press
-// 38=up, 40=down, 32=space
-// "keyup", "keydown"
-function simulateKeyPress(keycode, type) {
-	var evt = new Event(type);
-	evt.keyCode=keycode;
-	evt.which=evt.keyCode;
-	document.dispatchEvent(evt);
-}
-
 // Download the neural network (exported neural network)
 function downloadFile(filename, text) {
     var element = document.createElement('a');
@@ -427,23 +416,6 @@ function importNeuralNetwork(){
 	}
 	
 	$('#importModal').modal('close');
-}
-
-// Transform a multidimensionnal array into an 1 dimension array
-function ravel(array) {
-	var result = new Array();
-	if (typeof array[0] == "undefined" || typeof array[0] == "number") {//TO CHANGE
-		result = array;
-	}
-	else {
-		for (var i = 0; i < array.length; i++) {
-			for (var j = 0; j < array[i].length; j++) {
-				result.push(array[i][j]);
-			}
-		}
-	}
-
-	return result;
 }
 
 // For debug (faster to type)

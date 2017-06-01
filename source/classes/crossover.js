@@ -44,7 +44,7 @@ class singlePointCrossover extends crossover {
 		}
 
 		// For each genome minus the number of selected genomes divided by 2
-		for (var genIndex = 0; genIndex < pGeneration.genomes.length - (pSelectedGenomes.length / 2); genIndex++) {
+		for (var genIndex = 0; genIndex < pGeneration.genomes.length; genIndex++) {// - (pSelectedGenomes.length / 2)
 			//Pair of genome
 			for (var pairIndex = 0; pairIndex < pSelectedGenomes.length; pairIndex+=2) {
 				//Get the pair of genome
@@ -81,9 +81,9 @@ class singlePointCrossover extends crossover {
 		}
 
 		// Generate a random genomes
-		for (var genIndex = pGeneration.genomes.length - (pSelectedGenomes.length / 2); genIndex < pGeneration.genomes.length; genIndex++) {
+		/*for (var genIndex = pGeneration.genomes.length - (pSelectedGenomes.length / 2); genIndex < pGeneration.genomes.length; genIndex++) {
 			genClone.genomes[genIndex] = new Genome(pGeneration.topology, pGeneration.activationFunction);
-		}
+		}*/
 
 		// Return the new generation
 		return genClone.genomes;
