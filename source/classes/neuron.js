@@ -35,8 +35,10 @@ class Neuron {
 		// 
 		//this.gradient;
 
-		// hyperparameter
+		// learning rate (controls the adjustment at each update)
 		//this.eta = 0.15; // [0..1]
+
+		// Momentum (tends to keep the weight chaging in a consistent direction)
 		//this.alpha = 0.5; // [0..n]
 
 		// Store the activation function

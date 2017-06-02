@@ -38,6 +38,7 @@ class Connection {
 	 * Source : https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Math/random
      * @param {number} min - The min value.
      * @param {number} max - The max value.
+	 * @return {number} The random number
 	 */
 	randomWeight(min, max){
 		min = Math.ceil(min);

@@ -114,7 +114,7 @@ class rouletteWheelSelection extends selection{
 			// Get a random number between 0 and the weight sum
 			var threshold = Math.random() * weightSum;
 
-			// 
+			// Go through each genomes
 			for (var genomeIndex = 0; genomeIndex < pGeneration.genomes.length; genomeIndex++) {
 				sum += pGeneration.genomes[genomeIndex].fitness + 0.1;
 				// If the sum is bigger than the threshold, the current genome is selected and removed from the array
