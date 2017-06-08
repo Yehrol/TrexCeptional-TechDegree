@@ -102,6 +102,7 @@ class Generation {
 
 	/**
      * Get the fitness average of the generation
+     * @return {number} the average value.
      */
 	getFitnessAverage() {
 		var fitnessAverage = 0;
@@ -115,6 +116,7 @@ class Generation {
 
 	/**
      * Get the best fitness of the generation
+     * @return {number} the biggest value.
      */
 	getBestFitness() {
 		var bestFitness = 0;
@@ -125,6 +127,30 @@ class Generation {
 		}
 
 		return Math.pow(bestFitness,1/this.power);
+	}
+
+	/**
+	 * Set the weights of each genomes
+     * @return {number} All the weights.
+	 */
+	getAllWeights(){
+		var result = [];
+
+		for (var i = 0; i < this.genomes.length; i++) {
+			result.push(this.genomes[i].getWeights());
+		}
+
+		return result
+	}
+
+	/**
+	 * Set the weights of each genomes
+	 * @param {number} pWeights - All the weights
+	 */
+	setAllWeights(pWeights){
+		for (var i = 0; i < this.genomes.length; i++) {
+			this.genomes[i].setWeights(pWeights[i]);
+		}
 	}
  
 	/**

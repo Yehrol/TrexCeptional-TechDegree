@@ -37,7 +37,7 @@ class trexManager extends gameManager {
 		// Parent constructor
 		super();
 
-		this.defaultTopology = [2,2,1]; //4,4,1
+		this.defaultTopology = [2,1,1]; //4,4,1
 		this.defaultNumberOfGenomes = 12;
 		this.tmpFitness = 0;
 		this.lastXpos = 1000;
