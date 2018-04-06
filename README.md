@@ -17,3 +17,5 @@ A neural network of the supervised type will allow the creation of the structure
 The neural network takes normalized values and inputs from the game as well as "weights" that pass into mathematical functions. Those functions determine what action to make. Once each neural network has been used in a simulation, we take the ones with the biggest score to interchange their "weight" and modify them slightly. Thoses operations are repeated infinitely.
 
 This project allows to add new games by refering some values and gets a very good score on the games already implemented.
+
+link to test the project : https://lorisdebiasi.github.io/TrexCeptional-TechDegree/source/
